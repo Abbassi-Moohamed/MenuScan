@@ -59,7 +59,7 @@ npm run typecheck  # tsc --noEmit
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | The MENU SCAN backend base URL (see `src/config/api.ts`) |
+| `BACKEND_API_URL` | `http://localhost:4000` | The MENU SCAN backend origin, server-only. Proxies `/api/v1/*` through the Next origin and drives server-side data fetching (see `src/config/api.ts` + `next.config.ts`) |
 
 ## Project structure
 
