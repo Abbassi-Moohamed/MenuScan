@@ -5,7 +5,7 @@ import { siteConfig } from "@/config/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BackToTop } from "@/components/layout/BackToTop";
-import { menu } from "@/data/menu";
+import { PublicChrome } from "@/components/layout/PublicChrome";
 import { getDictionary } from "@/i18n";
 
 import "./globals.css";
@@ -22,7 +22,8 @@ const inter = Inter({
   display: "swap",
 });
 
-const dict = getDictionary(menu.language);
+const LANGUAGE = "fr";
+const dict = getDictionary();
 
 export const metadata: Metadata = {
   title: {
@@ -63,15 +64,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={menu.language} className={`${fraunces.variable} ${inter.variable}`}>
+    <html lang={LANGUAGE} className={`${fraunces.variable} ${inter.variable}`}>
       <body>
-        <a className="skip-link sr-only" href="#main">
-          {dict.a11y.skipLink}
-        </a>
-        <Header dict={dict} />
+        <PublicChrome>
+          <a className="skip-link sr-only" href="#main">
+            {dict.a11y.skipLink}
+          </a>
+          <Header dict={dict} />
+        </PublicChrome>
         {children}
-        <Footer dict={dict} />
-        <BackToTop label={dict.backToTop.label} />
+        <PublicChrome>
+          <Footer dict={dict} />
+          <BackToTop label={dict.backToTop.label} />
+        </PublicChrome>
       </body>
     </html>
   );

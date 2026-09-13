@@ -1,4 +1,4 @@
-import { menu } from "@/data/menu";
+import { siteConfig } from "@/config/site";
 import type { Dictionary } from "@/i18n/dictionary";
 
 interface FooterProps {
@@ -9,7 +9,7 @@ export function Footer({ dict }: FooterProps) {
   return (
     <footer className="site-footer">
       <div className="container site-footer__inner">
-        <span className="site-footer__brand">{menu.branding.name}</span>
+        <span className="site-footer__brand">{siteConfig.name}</span>
         <p className="site-footer__note">
           {dict.footer.note}
           <br />

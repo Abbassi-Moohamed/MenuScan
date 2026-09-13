@@ -47,7 +47,7 @@ const DRIFT_MAX = 8;
 
 /**
  * Generate a stable organic silhouette for a given seed key
- * (typically the category slug, e.g. `coffee`).
+ * (typically the category id, e.g. `6656e3bf…`).
  */
 export function bubbleGeometry(seedKey: string): BubbleGeometry {
   const random = mulberry32(fnv1a(`bubble:${seedKey}`));
@@ -64,40 +64,16 @@ export function bubbleGeometry(seedKey: string): BubbleGeometry {
   };
 }
 
-export type MenuCategorySize = "xl" | "lg" | "md" | "sm";
+/** Uniform bubble size: every category contributes the same row weight. */
+export const CATEGORY_WEIGHT = 1.0;
+export const CATEGORY_ASPECT = 1.12;
 
-export interface SizeMeta {
-  /** Relative width per unit weight in a row (1.0 ≈ average). */
-  weight: number;
-  /** Width / height ratio — larger means a wider, shallower bubble. */
-  aspect: number;
-}
-
-const SIZE_META: Record<MenuCategorySize, SizeMeta> = {
-  xl: { weight: 1.45, aspect: 1.5 },
-  lg: { weight: 1.1, aspect: 1.28 },
-  md: { weight: 1.0, aspect: 1.12 },
-  sm: { weight: 0.78, aspect: 1.02 },
-};
-
-/** Maximum combined weight per row before wrapping to a new row. */
+/** Maximum combined weight per row before wrapping to a new row (≈3 per row). */
 const MAX_ROW_WEIGHT = 3.1;
-
-export function categorySize(category: MenuCategory): MenuCategorySize {
-  return category.size ?? "md";
-}
-
-export function categoryWeight(category: MenuCategory): number {
-  return SIZE_META[categorySize(category)].weight;
-}
-
-export function categoryAspect(category: MenuCategory): number {
-  return SIZE_META[categorySize(category)].aspect;
-}
 
 /**
  * Greedy "float" layout: pack categories into rows while each row's total
- * weight stays below `MAX_ROW_WEIGHT`, so rows fill with 2–3 varied bubbles.
+ * weight stays below `MAX_ROW_WEIGHT`, so rows fill with 2–3 bubbles.
  */
 export function layoutBubbleRows(categories: MenuCategory[]): MenuCategory[][] {
   const rows: MenuCategory[][] = [];
@@ -105,7 +81,7 @@ export function layoutBubbleRows(categories: MenuCategory[]): MenuCategory[][] {
   let weight = 0;
 
   for (const category of categories) {
-    const nextWeight = categoryWeight(category);
+    const nextWeight = CATEGORY_WEIGHT;
     if (current.length > 0 && weight + nextWeight > MAX_ROW_WEIGHT) {
       rows.push(current);
       current = [];

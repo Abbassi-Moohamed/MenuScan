@@ -1,6 +1,6 @@
 {
-  "name": "CoffeScan — Menu",
-  "short_name": "CoffeScan",
+  "name": "MenuScan — Menu",
+  "short_name": "MenuScan",
   "description": "Café de spécialité et douceurs de saison. Ouvrez le menu directement sur votre téléphone.",
   "start_url": "/",
   "scope": "/",

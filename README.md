@@ -1,27 +1,37 @@
-# CoffeScan
+# MENU SCAN — Frontend
 
 > Un menu numérique pour cafés — premium, mobile-first, pensé pour un accès par QR-code.
 
-CoffeScan turns a coffee shop's menu into a fast, beautiful mobile experience.
+**MENU SCAN** turns a coffee shop's menu into a fast, beautiful mobile experience.
+It is a multi-tenant platform: every coffee shop gets its own public page
+(`https://menuscan.vercel.app/menuscan/:slug`) served from the MENU SCAN backend API.
 Instead of a long scrolling page, guests land on an interactive discovery screen
-with organic category bubbles, and expand any bubble into that category's full
-product sheet.
+with organic category bubbles, and follow any bubble to that category's dedicated
+items page.
 
 ## Highlights
 
+- **Single namespace** — everything lives under `/menuscan`: the brand landing
+  (`/menuscan`), a coffee's public menu (`/menuscan/[slug]`) and its category items
+  pages (`/menuscan/[slug]/[categName]`), plus the backoffice (`/menuscan/admin` and
+  `/menuscan/[slug]/admin`). Legacy `/:coffeeSlug` links redirect to the new routes.
 - **Bubble discovery** — categories as organic, seeded blob shapes (deterministic,
   stable across renders) with varied size, tilt, and silhouette. No two cafés feel alike.
-- **Category sheets** — tapping a bubble expands it into a full-screen sheet that
-  zooms from the tapped bubble (CSS `transform-origin`), with staggered product cards.
-- **Deep-link friendly** — each category is addressable (`#c-coffee`) so browser back,
-  refresh, and sharing a link all restore the right sheet.
-- **French-first** — UI copy, product names, and prices in French, locale `fr-TN`,
-  prices rendered in Tunisian dinars with three fraction digits (e.g. `2,200 DT`).
+- **Category pages** — following a bubble opens that category's full item page,
+  resolvable by slugified category name strictly within the owning coffee; unknown
+  coffees or categories are clean 404s.
+- **Deep-link friendly** — every coffee (`/menuscan/:slug`) and category
+  (`/menuscan/:slug/:categName`) is addressable directly, so sharing a link and refresh
+  always land on the exact view.
+- **French-first** — UI copy in French, locale `fr-TN`, prices rendered in Tunisian
+  dinars with three fraction digits (e.g. `2,200 DT`).
 - **QR-optimized** — zero friction for a phone's first visit: tiny hero, no horizontal
   overflow, one-handed layout, reduced-motion support, full keyboard/AT
-  accessibility (focus return, `Escape` to close, `aria` dialogs).
+  accessibility.
 - **Lightweight by design** — no CSS framework, no runtime image dependencies.
   Products are rendered as gradient art unless an optional `image` URL is provided.
+- **Backoffice** — app admins manage all coffees; a coffee admin manages their own
+  shop's info, categories and items (PIN-gated, short-lived bearer tokens).
 
 ## Tech stack
 
@@ -32,6 +42,7 @@ product sheet.
 | Language   | TypeScript (strict)                 |
 | Styling    | Plain CSS modules-free `globals.css` using design tokens |
 | Fonts      | Fraunces + Inter (`next/font`, self-hosted) |
+| API        | MENU SCAN backend (`/api/v1`, success + error envelopes) |
 
 ## Getting started
 
@@ -44,37 +55,47 @@ npm run lint       # eslint
 npm run typecheck  # tsc --noEmit
 ```
 
+### Environment
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | The MENU SCAN backend base URL (see `src/config/api.ts`) |
+
 ## Project structure
 
 ```
 frontend/
 ├── public/                 # icons + PWA manifest (fr)
-├── src/
-│   ├── app/                # layout, metadata, page, globals.css
-│   ├── components/
-│   │   ├── layout/         # Header, Footer, BackToTop
-│   │   └── menu/           # BrandIntro, bubbles, sheet, item cards…
-│   ├── config/             # site metadata
-│   ├── data/menu.ts        # ← the menu itself (categories, items, prices)
-│   ├── i18n/               # typed Dictionary + French strings
-│   ├── lib/                # blob geometry/layout, price formatting, utils
-│   └── types/menu.ts       # Menu / Category / Item / Price types
-└── package.json
+└── src/
+        ├── app/
+        │   ├── layout.tsx      # root layout, fonts, metadata
+        │   └── menuscan/       # brand landing + [slug] menu/[categName] pages + admin backoffice
+        ├── components/
+        │   ├── layout/         # Header, Footer, BackToTop
+        │   └── menu/           # BrandIntro, bubble links, item cards…
+    ├── config/             # site metadata + API base URL
+    ├── i18n/               # typed Dictionary + French strings
+    ├── lib/                # api client, admin-session, blob geometry/layout, price formatting, adapters
+    └── types/              # menu.ts (presentation) + backend.ts (API DTOs)
 ```
 
-## Customizing the menu
+Request paths mirror the backend API (see `backend/ROUTES.md`): public menu via
+`/api/v1/coffees/:coffeeSlug` and `/api/v1/categories/:categoryId/items`, backoffice
+under `/api/v1/admin/...`. The client lives in `src/lib/api.ts`; API DTOs are mirrored
+verbatim in `src/types/backend.ts`.
 
-Everything is data-driven from `src/data/menu.ts`.
+## Data model
 
-- **Prices** are stored in the smallest currency unit (millimes): `price: { value: 220 }`
-  renders as `2,200 DT`. TND always uses three fraction digits; other currencies fall
-  back to two.
-- **Categories** accept an optional `size` (`xl | lg | md | sm`) that controls the
-  relative width/aspect of their bubble. The row layout packs them greedily, so a menu
-  will re-flow naturally when you add or resize categories.
-- **Products** take `name`, `description`, `price`, optional `image`, `accent`,
-  `tags` (`Populaire`, `Nouveau`, `Végan`, …) and `featured`. Without an `image` the
-  item renders as a gradient placeholder using its accent color.
+The menu is **not** hard-coded — it comes from the backend for each coffee:
+
+- **Prices** are decimal numbers (e.g. `2.5` TND), stored and displayed as-is.
+  `formatPrice` (in `src/lib/menu.ts`) renders them with `Intl.NumberFormat`; TND
+  always uses three fraction digits, other currencies two.
+- **Categories** carry an optional `icon` emoji and an `accent` color that drives the
+  bubble visuals and row layout (`CATEGORY_WEIGHT`, `CATEGORY_ASPECT` in
+  `src/lib/blob.ts`).
+- **Items** take `name`, `description`, `price`, optional `image` and an `accent`
+  seed for the gradient placeholder when no image is provided.
 - **Copy** lives in `src/i18n/fr.ts` (typography-agnostic keys), and the brand/tagline
   in `src/config/site.ts`.
 
@@ -82,4 +103,4 @@ Everything is data-driven from `src/data/menu.ts`.
 
 ## License
 
-Private — © CoffeScan.
+Private — © MenuScan.

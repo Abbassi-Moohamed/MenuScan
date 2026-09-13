@@ -1,14 +1,13 @@
-import type { MenuLanguage } from "@/types/menu";
-
 import type { Dictionary } from "./dictionary";
 import { fr } from "./fr";
 
-const dictionaries: Partial<Record<MenuLanguage, Dictionary>> = {
-  fr,
-};
-
-export function getDictionary(language: MenuLanguage): Dictionary {
-  return dictionaries[language] ?? fr;
+/**
+ * All UI copy lives in the single French dictionary for now. `getDictionary`
+ * takes no arguments — the parameter and `MenuLanguage` abstraction buy
+ * nothing until a second language actually exists.
+ */
+export function getDictionary(): Dictionary {
+  return fr;
 }
 
 export type { Dictionary };

@@ -1,4 +1,4 @@
-import { menu } from "@/data/menu";
+import { siteConfig } from "@/config/site";
 import type { Dictionary } from "@/i18n/dictionary";
 
 interface HeaderProps {
@@ -9,17 +9,13 @@ export function Header({ dict }: HeaderProps) {
   return (
     <header className="site-header">
       <div className="container site-header__inner">
-        <a
-          className="site-header__brand"
-          href="#top"
-          aria-label={menu.branding.name}
-        >
+        <a className="site-header__brand" href="#top" aria-label={siteConfig.name}>
           <span className="brand-mark" aria-hidden="true">
-            {menu.branding.name.charAt(0)}
+            {siteConfig.name.charAt(0)}
           </span>
           <span className="brand-text">
-            <span className="brand-name">{menu.branding.name}</span>
-            <span className="brand-tagline">{menu.branding.tagline}</span>
+            <span className="brand-name">{siteConfig.name}</span>
+            <span className="brand-tagline">Menu numérique</span>
           </span>
         </a>
         <span className="site-header__spacer" aria-hidden="true" />
