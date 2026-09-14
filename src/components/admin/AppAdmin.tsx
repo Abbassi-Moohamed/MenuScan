@@ -138,7 +138,7 @@ export function AppAdmin() {
     setFormBusy(true);
     setFormError(null);
     try {
-      const created = await createCoffee(token, { name: values.name, logo: values.logo });
+      const created = await createCoffee(token, { name: values.name, logo: values.logo, cover: values.cover });
       loadCoffees();
       setForm(null);
       setNotice(d.coffeeForm.created(created.name));
@@ -163,6 +163,7 @@ export function AppAdmin() {
       const updated = await updateCoffee(token, coffee.id, {
         name: values.name,
         logo: values.logo,
+        cover: values.cover,
         slug: values.slug,
       });
       loadCoffees();
@@ -222,7 +223,7 @@ export function AppAdmin() {
 
   const formInitial =
     form?.mode === "edit"
-      ? { name: form.coffee.name, logo: form.coffee.logo, slug: form.coffee.slug }
+      ? { name: form.coffee.name, logo: form.coffee.logo, cover: form.coffee.cover ?? undefined, slug: form.coffee.slug }
       : undefined;
 
   return (

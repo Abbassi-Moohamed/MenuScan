@@ -96,6 +96,10 @@ export interface Dictionary {
       logoHint: string;
       logoPreview: string;
       logoUploadFailed: string;
+      cover: string;
+      coverPlaceholder: string;
+      coverHint: string;
+      coverPreview: string;
       slug: string;
       slugHint: string;
       slugInvalid: string;

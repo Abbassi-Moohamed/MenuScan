@@ -7,6 +7,7 @@ interface BrandIntroProps {
   name: string;
   /** Optional remote logo (coffee pages); omitted on the brand landing. */
   logo?: string;
+  cover?: string | null;
   /** Eyebrow pill text. Defaults to the menu eyebrow. */
   eyebrow?: string;
   /** Description line (used on the MENU SCAN landing page). */
@@ -22,6 +23,7 @@ interface BrandIntroProps {
 export function BrandIntro({
   name,
   logo,
+  cover,
   eyebrow,
   description,
   menuTitle,
@@ -33,7 +35,7 @@ export function BrandIntro({
   const hasCounts = categoriesCount != null || itemsCount != null;
 
   return (
-    <section className="brand-intro">
+    <section className="brand-intro" style={cover ? { backgroundImage: `linear-gradient(rgb(34 24 18 / 0.58), rgb(34 24 18 / 0.72)), url("${cover}")` } : undefined}>
       <div className="container">
         {logo ? (
           <div className="brand-intro__logo">

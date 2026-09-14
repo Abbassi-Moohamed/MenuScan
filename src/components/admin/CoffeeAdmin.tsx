@@ -367,6 +367,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
       const updated = await updateMyCoffee(token, {
         name: values.name,
         logo: values.logo,
+        cover: values.cover,
         slug: values.slug,
       });
       setCoffee(updated);
@@ -590,7 +591,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
             <CoffeeForm
               dict={dict}
               mode="edit"
-              initial={{ name: coffee.name, logo: coffee.logo, slug: coffee.slug }}
+              initial={{ name: coffee.name, logo: coffee.logo, cover: coffee.cover ?? undefined, slug: coffee.slug }}
               title={d.coffeeForm.editTitle}
               busy={settingsBusy}
               error={settingsError}

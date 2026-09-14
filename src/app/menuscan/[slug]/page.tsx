@@ -35,6 +35,7 @@ export default async function CoffeePage({ params }: CoffeePageProps) {
         <BrandIntro
           name={coffee.name}
           logo={coffee.logo}
+          cover={coffee.cover}
           categoriesCount={coffee.categories.length}
         />
         <CategoryBubbles coffeeSlug={slug} categories={coffee.categories.map(toMenuCategory)} />

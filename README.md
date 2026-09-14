@@ -216,10 +216,10 @@ flowchart TD
 
 | Type | Fields |
 | --- | --- |
-| `CoffeeDto` | `id`, `name`, `logo`, `slug`, `categories: CategoryDto[]` |
+| `CoffeeDto` | `id`, `name`, `logo`, `cover: string \| null`, `slug`, `categories: CategoryDto[]` |
 | `CategoryDto` | `id`, `name`, `image: string \| null` |
 | `ItemDto` | `id`, `name`, `description: string \| null`, `price: number`, `image: string \| null` |
-| `AdminCoffeeDto` | `id`, `name`, `logo`, `slug`, `categoryCount`, `createdAt`, `updatedAt` |
+| `AdminCoffeeDto` | `id`, `name`, `logo`, `cover: string \| null`, `slug`, `categoryCount`, `createdAt`, `updatedAt` |
 | `AdminCategoryDto` | `id`, `name`, `image: string \| null`, `createdAt`, `updatedAt` |
 | `AdminItemDto` | `id`, `name`, `description`, `price`, `image`, `itemCategoryId`, timestamps |
 
@@ -326,7 +326,7 @@ coffee owner ID.
 | Method | Endpoint | Operation |
 | --- | --- | --- |
 | `GET` | `/api/v1/admin/my-coffee` | Load the authenticated coffee |
-| `PATCH` | `/api/v1/admin/my-coffee` | Edit coffee name/logo/slug |
+| `PATCH` | `/api/v1/admin/my-coffee` | Edit coffee name, logo, cover, or slug |
 | `PATCH` | `/api/v1/admin/my-coffee/pin` | Change current coffee PIN |
 | `GET` | `/api/v1/admin/my-coffee/categories` | List owned categories |
 | `POST` | `/api/v1/admin/my-coffee/categories` | Create category |
@@ -381,8 +381,8 @@ session restoration, CRUD mutations, tabs, dialogs, and transient notices.
 `AppAdmin` accepts only an `APP_ADMIN` session. After authentication it:
 
 - loads all coffees with `GET /admin/coffees`;
-- creates coffees with name and logo URL;
-- edits name, logo, and optionally slug;
+- creates coffees with name, logo, and optional cover image;
+- edits name, logo, cover, and optionally slug;
 - deletes a coffee after an explicit confirmation dialog;
 - resets a coffee PIN through the reset endpoint after confirmation;
 - links each coffee to its public menu.
@@ -463,7 +463,8 @@ request still carries the bearer token and must be authorized by the backend.
 `CoffeeForm` supports create and edit modes. It requires a non-empty name and
 allows either an existing absolute logo URL or a device-selected image. New
 files are previewed locally, uploaded to the backend, and only then persisted
-by the coffee CRUD request. Edit mode optionally accepts a slug matching
+by the coffee CRUD request. The optional cover uses the same upload flow and
+is rendered as the public menu hero background. Edit mode optionally accepts a slug matching
 `[a-z0-9]+(?:-[a-z0-9]+)*`.
 
 ### Category forms

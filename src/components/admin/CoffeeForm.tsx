@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export interface CoffeeFormValues {
   name: string;
   logo: string;
+  cover?: string;
   slug?: string;
 }
 
@@ -47,15 +48,19 @@ export function CoffeeForm({
   const t = dict.admin.coffeeForm;
   const [name, setName] = useState(initial?.name ?? "");
   const [logo, setLogo] = useState(initial?.logo ?? "");
+  const [cover, setCover] = useState(initial?.cover ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState(initial?.logo ?? "");
   const [submitting, setSubmitting] = useState(false);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState(initial?.cover ?? "");
 
   useEffect(() => () => {
     if (preview.startsWith("blob:")) URL.revokeObjectURL(preview);
-  }, [preview]);
+    if (coverPreview.startsWith("blob:")) URL.revokeObjectURL(coverPreview);
+  }, [preview, coverPreview]);
 
   const handleSubmit = async () => {
     if (submitting) return;
@@ -71,6 +76,10 @@ export function CoffeeForm({
       setFieldError(t.logoRequired);
       return;
     }
+    if (!coverFile && cover.trim().length > 0 && !isHttpUrl(cover.trim())) {
+      setFieldError(t.urlInvalid);
+      return;
+    }
     if (mode === "edit" && trimmedSlug.length > 0 && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(trimmedSlug)) {
       setFieldError(t.slugInvalid);
       return;
@@ -80,9 +89,11 @@ export function CoffeeForm({
     setSubmitting(true);
     try {
       const uploadedLogo = file ? await onUpload(file) : trimmedLogo;
+      const uploadedCover = coverFile ? await onUpload(coverFile) : cover.trim();
       await onSubmit({
         name: trimmedName,
         logo: uploadedLogo,
+        cover: uploadedCover || undefined,
         slug: mode === "edit" && trimmedSlug.length > 0 ? trimmedSlug : undefined,
       });
     } catch (error) {
@@ -108,6 +119,38 @@ export function CoffeeForm({
           disabled={busy || submitting}
           onChange={(event) => setName(event.target.value)}
         />
+      </label>
+
+      <label className="admin-field">
+        <span className="admin-field__label">{t.cover}</span>
+        <input
+          className="admin-field__input"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          disabled={busy || submitting}
+          onChange={(event) => {
+            const selected = event.target.files?.[0] ?? null;
+            if (!selected) return;
+            if (coverPreview.startsWith("blob:")) URL.revokeObjectURL(coverPreview);
+            setCoverFile(selected);
+            setCoverPreview(URL.createObjectURL(selected));
+          }}
+        />
+        {coverPreview ? (
+          // Blob previews cannot be passed through next/image's remote loader.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="admin-upload-preview" src={coverPreview} alt={t.coverPreview} />
+        ) : null}
+        <input
+          className="admin-field__input"
+          type="url"
+          inputMode="url"
+          value={cover}
+          placeholder={t.coverPlaceholder}
+          disabled={busy || submitting}
+          onChange={(event) => setCover(event.target.value)}
+        />
+        <span className="admin-field__hint">{t.coverHint}</span>
       </label>
 
       <label className="admin-field">
