@@ -11,6 +11,8 @@ interface AdminLayoutProps {
   title: string;
   /** Optional label under the title (role). */
   subtitle?: string;
+  /** Optional current coffee logo. App-admin keeps the MENU SCAN mark. */
+  logo?: string | null;
   /** Optional public menu link (coffee admin). */
   publicMenuHref?: string;
   onLogout: () => void;
@@ -25,6 +27,7 @@ export function AdminLayout({
   dict,
   title,
   subtitle,
+  logo,
   publicMenuHref,
   onLogout,
   children,
@@ -34,9 +37,15 @@ export function AdminLayout({
       <header className="admin-bar">
         <div className="admin-bar__inner">
           <div className="admin-bar__brand">
-            <span className="brand-mark" aria-hidden="true">
-              {siteConfig.name.charAt(0)}
-            </span>
+            {logo ? (
+              // The coffee logo identifies the active backoffice context.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="admin-bar__logo" src={logo} alt="" />
+            ) : (
+              <span className="brand-mark" aria-hidden="true">
+                {siteConfig.name.charAt(0)}
+              </span>
+            )}
             <span className="admin-bar__text">
               <span className="admin-bar__title">{title}</span>
               {subtitle ? <span className="admin-bar__subtitle">{subtitle}</span> : null}

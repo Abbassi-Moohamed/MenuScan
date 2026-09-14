@@ -5,7 +5,7 @@ export const fr: Dictionary = {
     addToCart: "Ajouter à la commande", openCart: "Ouvrir la commande", closeCart: "Fermer",
     cartTitle: "Votre commande", emptyCart: "Votre commande est vide.", decrease: "Diminuer",
     increase: "Augmenter", total: "Total", tableNumber: "Numéro de table",
-    tablePlaceholder: "Ex. 12", submit: "Envoyer la commande", submitting: "Envoi…",
+    tablePlaceholder: "Ex. 12", addedToCart: "Ajouté ✓", viewOrder: "Voir ma commande", submit: "Envoyer la commande", submitting: "Envoi…",
     invalidCheckout: "Ajoutez un article disponible et indiquez votre numéro de table.",
     submitError: "Impossible d'envoyer la commande.", statusLink: "Suivre une commande",
     confirmationTitle: "Commande reçue !", confirmationMessage: "Le café a reçu votre commande.",

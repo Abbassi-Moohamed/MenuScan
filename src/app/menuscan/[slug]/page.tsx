@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { MenuScene } from "@/components/menu/MenuScene";
+import { OrderCenter } from "@/components/ordering/OrderCenter";
 import { toMenuCategory } from "@/lib/adapters";
 import { getCoffeeBySlug } from "@/lib/api";
 import { resolvePublicCoffee } from "@/lib/public-coffee";
@@ -38,6 +39,7 @@ export default async function CoffeePage({ params }: CoffeePageProps) {
           coffeeSlug={slug}
           categories={coffee.categories.map(toMenuCategory)}
         />
+        <OrderCenter coffeeSlug={slug} />
       </main>
     </div>
   );

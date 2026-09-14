@@ -429,6 +429,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
       dict={dict}
       title={coffee?.name ?? coffeeSlug}
       subtitle={d.chrome.roleCoffee}
+      logo={coffee?.logo}
       publicMenuHref={`/menuscan/${coffeeSlug}`}
       onLogout={() => {
         clearSession();
