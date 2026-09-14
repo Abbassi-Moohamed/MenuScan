@@ -10,6 +10,8 @@ export interface ItemFormValues {
   name: string;
   description?: string;
   price: number;
+  promotion: number | null;
+  isAvailable: boolean;
   image?: string;
 }
 
@@ -17,7 +19,7 @@ interface ItemFormProps {
   dict: Dictionary;
   title: string;
   /** Existing values when editing (price is the backend decimal, e.g. `4.5`). */
-  initial?: { name: string; description: string | null; price: number; image: string | null };
+  initial?: { name: string; description: string | null; price: number; promotion: number | null; isAvailable: boolean; image: string | null };
   busy: boolean;
   /** Server-side error (already translated). */
   error?: string | null;
@@ -31,6 +33,8 @@ export function ItemForm({ dict, title, initial, busy, error, onSubmit, onUpload
   const [name, setName] = useState(initial?.name ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState(initial ? String(initial.price) : "");
+  const [promotion, setPromotion] = useState(initial?.promotion != null ? String(initial.promotion) : "");
+  const [isAvailable, setIsAvailable] = useState(initial?.isAvailable ?? true);
   const [image, setImage] = useState(initial?.image ?? "");
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -54,6 +58,10 @@ export function ItemForm({ dict, title, initial, busy, error, onSubmit, onUpload
       setFieldError(t.priceInvalid);
       return;
     }
+    if (promotion.trim().length > 0 && (!isValidPrice(promotion) || Number(promotion) <= 0 || Number(promotion) >= Number(price))) {
+      setFieldError(t.promotionInvalid);
+      return;
+    }
     if (!file && trimmedImage.length > 0 && !isHttpUrl(trimmedImage)) {
       setFieldError(t.urlInvalid);
       return;
@@ -67,6 +75,8 @@ export function ItemForm({ dict, title, initial, busy, error, onSubmit, onUpload
         name: trimmedName,
         description: description.trim().length > 0 ? description.trim() : undefined,
         price: Number(price),
+        promotion: promotion.trim().length > 0 ? Number(promotion) : null,
+        isAvailable,
         image: uploadedImage.length > 0 ? uploadedImage : undefined,
       });
     } catch (error) {
@@ -92,6 +102,18 @@ export function ItemForm({ dict, title, initial, busy, error, onSubmit, onUpload
           disabled={busy || submitting}
           onChange={(event) => setName(event.target.value)}
         />
+      </label>
+
+      <label className="admin-field">
+        <span className="admin-field__label">{t.promotion}</span>
+        <input className="admin-field__input" type="number" inputMode="decimal" min="0.001" step="0.001" value={promotion} placeholder={t.promotionPlaceholder} disabled={busy || submitting} onChange={(event) => setPromotion(event.target.value)} />
+        <span className="admin-field__hint">{t.promotionHint}</span>
+      </label>
+
+      <label className="admin-field admin-field--checkbox">
+        <span className="admin-field__label">{t.availability}</span>
+        <input type="checkbox" checked={isAvailable} disabled={busy || submitting} onChange={(event) => setIsAvailable(event.target.checked)} />
+        <span>{isAvailable ? t.available : t.unavailable}</span>
       </label>
 
       <label className="admin-field">

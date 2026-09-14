@@ -433,6 +433,20 @@ img {
   flex-direction: column;
   gap: 0.75rem;
   overflow: hidden;
+  height: clamp(19rem, 46svh, 28rem);
+  min-height: 0;
+}
+
+.bubble-field--rows-2 {
+  height: clamp(23rem, 52svh, 32rem);
+}
+
+.bubble-field--rows-3 {
+  height: clamp(27rem, 60svh, 37rem);
+}
+
+.bubble-field--rows-4 {
+  height: clamp(31rem, 68svh, 42rem);
 }
 
 .bubble-row {
@@ -471,7 +485,7 @@ img {
     var(--shadow-pop),
     0 0 0 4px color-mix(in srgb, var(--bubble-border, #ffffff) 80%, transparent),
     0 0.75rem 1.5rem rgb(30 21 13 / 0.22);
-  transform: scale(1.04) rotate(var(--bubble-tilt));
+  transform: rotate(var(--bubble-tilt)) scale(1.04);
 }
 
 .bubble-drag-layer:has(.bubble:active) {
@@ -536,10 +550,8 @@ img {
   isolation: isolate;
   overflow: hidden;
   transition: filter 180ms ease, box-shadow 180ms ease;
-  will-change: transform, box-shadow;
-  animation:
-    bubble-swim var(--bubble-duration, 4.5s) ease-in-out var(--bubble-delay, 0ms) infinite,
-    bubble-border-glow 4.8s ease-in-out var(--bubble-delay, 0ms) infinite;
+  will-change: transform;
+  animation: bubble-float var(--bubble-duration, 5.8s) ease-in-out var(--bubble-delay, 0ms) infinite;
 }
 
 .bubble::before {
@@ -633,42 +645,17 @@ img {
     filter: brightness(1.06);
     box-shadow: 0 10px 28px rgb(43 30 18 / 0.22);
     animation-play-state: paused;
-    transform: rotate(var(--bubble-tilt))
-      translate(
-        calc(var(--bubble-drift-x) + 1px),
-        calc(var(--bubble-drift) - 3px)
-      )
-      scale(1.02);
+    transform: rotate(var(--bubble-tilt)) translateY(-3px) scale(1.02);
   }
 }
 
-@keyframes bubble-swim {
+@keyframes bubble-float {
   0%,
   100% {
-    transform: rotate(var(--bubble-tilt))
-      translate(var(--bubble-drift-x), var(--bubble-drift));
+    transform: rotate(var(--bubble-tilt)) translateY(0);
   }
   50% {
-    transform: rotate(calc(var(--bubble-tilt) * -0.55))
-      translate(
-        calc(var(--bubble-drift-x) * var(--bubble-direction, -1)),
-        calc(var(--bubble-drift) - 7px)
-      );
-  }
-}
-
-@keyframes bubble-border-glow {
-  0%,
-  100% {
-    box-shadow:
-      var(--shadow-pop),
-      0 0 0 2px color-mix(in srgb, var(--bubble-border, #ffffff) 46%, transparent);
-  }
-  50% {
-    box-shadow:
-      var(--shadow-pop),
-      0 0 0 4px color-mix(in srgb, var(--bubble-border, #ffffff) 80%, transparent),
-      0 0 1.15rem color-mix(in srgb, var(--bubble-border, #ffffff) 32%, transparent);
+    transform: rotate(var(--bubble-tilt)) translateY(-5px);
   }
 }
 
@@ -928,6 +915,87 @@ img {
   box-shadow: var(--shadow-card);
   animation: item-card-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--delay, 0ms);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.item-card--promotion {
+  border: 2px solid color-mix(in srgb, var(--color-amber-600) 68%, var(--color-line));
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 4px color-mix(in srgb, var(--color-amber-100) 72%, transparent);
+}
+
+.item-card--unavailable {
+  border-color: color-mix(in srgb, var(--color-mocha-400) 50%, var(--color-line));
+  background: var(--color-cream-50);
+}
+
+.item-card__promotion {
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  margin: 0.7rem 0.75rem -0.15rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: var(--color-amber-600);
+  box-shadow: 0 0.25rem 0.65rem rgb(146 64 14 / 0.2);
+  color: var(--color-cream-100);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.item-card--unavailable .item-card__promotion {
+  background: var(--color-mocha-700);
+  box-shadow: none;
+}
+
+.item-card__unavailable-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(30 21 13 / 0.48);
+}
+
+.item-card__unavailable-overlay span {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: var(--radius-full);
+  background: rgb(30 21 13 / 0.82);
+  color: var(--color-cream-100);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.item-card__prices {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.item-card__price--old {
+  color: var(--color-mocha-400);
+  font-size: 0.78rem;
+  text-decoration: line-through;
+}
+
+.item-card__availability {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-mocha-400) 16%, transparent);
+  color: var(--color-mocha-700);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 @keyframes item-card-in {
@@ -1106,9 +1174,9 @@ img {
 }
 
 .menu-page .bubble-field {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
-  height: auto;
+  max-height: 100%;
   padding-bottom: 4.75rem;
   overflow: hidden;
 }

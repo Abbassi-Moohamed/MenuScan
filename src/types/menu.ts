@@ -18,6 +18,8 @@ export interface MenuItem {
   description: string;
   /** Decimal backend price (e.g. `2.5` TND) — stored and displayed as-is. */
   price: number;
+  promotion: number | null;
+  isAvailable: boolean;
   /** Remote image URL. Images are optional — a gradient placeholder is used when absent. */
   image?: string;
   /** Seed color used for the gradient placeholder and highlights. */

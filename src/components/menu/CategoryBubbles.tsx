@@ -45,11 +45,8 @@ function CategoryLink({
     aspectRatio: CATEGORY_ASPECT.toFixed(3),
     borderRadius: geometry.borderRadius,
     "--bubble-tilt": `${geometry.tilt}deg`,
-    "--bubble-drift": `${geometry.translateY}px`,
-    "--bubble-drift-x": `${geometry.translateX}px`,
     "--bubble-duration": "5.2s",
     "--bubble-delay": `${visualIndex * -320}ms`,
-    "--bubble-direction": visualIndex % 2 === 0 ? "1" : "-1",
     "--bubble-overlay": categoryAccentAt(visualIndex + 5),
     "--bubble-border": categoryAccentAt(visualIndex + 9),
     ...accentGradientStyle(categoryAccentAt(visualIndex)),
@@ -166,15 +163,6 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
       bubbleHeight: bubble.height,
       moved: false,
     };
-    setPositions((current) => ({
-      ...current,
-      [id]: {
-        x: bubble.left - scene.bounds.left,
-        y: bubble.top - scene.bounds.top,
-        width: bubble.width,
-        height: bubble.height,
-      },
-    }));
     setDraggingId(id);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -185,6 +173,17 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
     const nextX = event.clientX - drag.sceneLeft - drag.grabX;
     const nextY = event.clientY - drag.sceneTop - drag.grabY;
     if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 6) {
+      if (!drag.moved) {
+        setPositions((current) => ({
+          ...current,
+          [drag.id]: {
+            x: drag.startX - drag.sceneLeft - drag.grabX,
+            y: drag.startY - drag.sceneTop - drag.grabY,
+            width: drag.bubbleWidth,
+            height: drag.bubbleHeight,
+          },
+        }));
+      }
       drag.moved = true;
       suppressClickRef.current = true;
     }
@@ -228,7 +227,10 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
   }
 
   return (
-    <nav className="bubble-field" aria-label={dict.explore.categoriesAriaLabel}>
+    <nav
+      className={`bubble-field bubble-field--rows-${Math.min(rows.length, 4)}`}
+      aria-label={dict.explore.categoriesAriaLabel}
+    >
       {rows.map((row, rowIndex) => (
         <div key={rowIndex} className={`bubble-row bubble-row--${row.length}`}>
         {row.map((category, categoryIndex) => (

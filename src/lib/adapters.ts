@@ -94,6 +94,8 @@ export function toMenuItem(item: ItemDto): MenuItem {
     name: item.name,
     description: item.description ?? "",
     price: item.price,
+    promotion: item.promotion ?? null,
+    isAvailable: item.isAvailable ?? true,
     image: item.image ?? undefined,
   };
 }

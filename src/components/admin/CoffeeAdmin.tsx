@@ -102,6 +102,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
   const [itemCounts, setItemCounts] = useState<Record<string, number>>({});
   const [itemForm, setItemForm] = useState<ItemFormState>(null);
   const [itemFormBusy, setItemFormBusy] = useState(false);
+  const [itemAvailabilityBusy, setItemAvailabilityBusy] = useState<string | null>(null);
   const [itemFormError, setItemFormError] = useState<string | null>(null);
   const [itemDelete, setItemDelete] = useState<AdminItemDto | null>(null);
   const [itemDeleteBusy, setItemDeleteBusy] = useState(false);
@@ -357,6 +358,25 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
     }
   };
 
+  const handleItemAvailability = async (item: AdminItemDto) => {
+    if (!token) return;
+    if (itemAvailabilityBusy === item.id) return;
+    setItemAvailabilityBusy(item.id);
+    try {
+      const updated = await updateMyItem(token, item.id, { isAvailable: !item.isAvailable });
+      setItems((current) => current?.map((entry) => (entry.id === updated.id ? updated : entry)) ?? current);
+      setNotice(d.items.saved(updated.name));
+    } catch (error) {
+      if (isSessionFailure(error)) {
+        handleExpired();
+        return;
+      }
+      setNotice(actionError(dict, error));
+    } finally {
+      setItemAvailabilityBusy(null);
+    }
+  };
+
   /* ---- Settings tab ------------------------------------------------------ */
 
   const handleSettingsSave = async (values: CoffeeFormValues) => {
@@ -549,6 +569,8 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
                           name: itemForm.item.name,
                           description: itemForm.item.description,
                           price: itemForm.item.price,
+                          promotion: itemForm.item.promotion,
+                          isAvailable: itemForm.item.isAvailable,
                           image: itemForm.item.image,
                         }
                       : undefined
@@ -575,6 +597,8 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
                   setItemForm({ mode: "edit", item });
                 }}
                 onDelete={(item) => setItemDelete(item)}
+                onToggleAvailability={(item) => void handleItemAvailability(item)}
+                availabilityBusyId={itemAvailabilityBusy}
               />
             </section>
           ) : null}

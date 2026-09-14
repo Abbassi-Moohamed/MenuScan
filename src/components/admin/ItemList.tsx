@@ -15,9 +15,11 @@ interface ItemListProps {
   onRetry: () => void;
   onEdit: (item: AdminItemDto) => void;
   onDelete: (item: AdminItemDto) => void;
+  onToggleAvailability: (item: AdminItemDto) => void;
+  availabilityBusyId?: string | null;
 }
 
-export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelete }: ItemListProps) {
+export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelete, onToggleAvailability, availabilityBusyId }: ItemListProps) {
   const d = dict.admin;
 
   if (loading) {
@@ -58,8 +60,18 @@ export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelet
           <span className="item-row__body">
             <span className="item-row__name">{item.name}</span>
             <span className="item-row__price">
-              {formatPrice(item.price, siteConfig.currency, siteConfig.locale)}
+              {item.promotion != null ? (
+                <>
+                  <s>{formatPrice(item.price, siteConfig.currency, siteConfig.locale)}</s>{" "}
+                  {formatPrice(item.promotion, siteConfig.currency, siteConfig.locale)}
+                </>
+              ) : (
+                formatPrice(item.price, siteConfig.currency, siteConfig.locale)
+              )}
             </span>
+            <button type="button" className="row-action" disabled={availabilityBusyId === item.id} aria-busy={availabilityBusyId === item.id} onClick={() => onToggleAvailability(item)}>
+              {item.isAvailable ? d.items.available : d.items.unavailable}
+            </button>
           </span>
           <div className="item-row__actions">
             <button type="button" className="row-action" onClick={() => onEdit(item)}>

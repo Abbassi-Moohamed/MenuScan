@@ -27,6 +27,10 @@ export interface Dictionary {
     errorMessage: string;
     retryLabel: string;
   };
+  menuItem: {
+    promotion: string;
+    unavailable: string;
+  };
   backToTop: {
     label: string;
   };
@@ -170,6 +174,13 @@ export interface Dictionary {
       imageHint: string;
       nameRequired: string;
       priceInvalid: string;
+      promotion: string;
+      promotionPlaceholder: string;
+      promotionHint: string;
+      promotionInvalid: string;
+      availability: string;
+      available: string;
+      unavailable: string;
       urlInvalid: string;
       saved: (name: string) => string;
     };

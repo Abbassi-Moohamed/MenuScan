@@ -47,6 +47,8 @@ export interface ItemDto {
   description: string | null;
   /** Decimal price in the coffee's default currency (e.g. `2.5` TND). */
   price: number;
+  promotion: number | null;
+  isAvailable: boolean;
   image: string | null;
 }
 
@@ -94,6 +96,8 @@ export interface AdminItemDto {
   name: string;
   description: string | null;
   price: number;
+  promotion: number | null;
+  isAvailable: boolean;
   image: string | null;
   itemCategoryId: string;
   createdAt: string;
@@ -126,6 +130,8 @@ export interface CreateItemBody {
   name: string;
   description?: string;
   price: number;
+  promotion?: number | null;
+  isAvailable?: boolean;
   image?: string;
 }
 
@@ -138,5 +144,7 @@ export interface UpdateItemBody {
   name?: string;
   description?: string;
   price?: number;
+  promotion?: number | null;
+  isAvailable?: boolean;
   image?: string;
 }

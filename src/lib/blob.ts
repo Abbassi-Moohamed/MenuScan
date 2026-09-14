@@ -32,24 +32,10 @@ export interface BubbleGeometry {
   borderRadius: string;
   /** Slight rotation in degrees to break the grid. */
   tilt: number;
-  /** Vertical drift in px to stagger rows of bubbles. */
-  translateY: number;
-  /** Horizontal drift in px, used to give each bubble a unique swim direction. */
-  translateX: number;
-  /** Animation duration in seconds, staggered per category. */
-  swimDuration: number;
-  /** Animation delay in milliseconds, staggered per category. */
-  swimDelay: number;
 }
 
 const TILT_MIN = -3.5;
 const TILT_MAX = 3.5;
-const DRIFT_MIN = -2;
-const DRIFT_MAX = 8;
-const HORIZONTAL_DRIFT_MIN = -4;
-const HORIZONTAL_DRIFT_MAX = 4;
-const SWIM_DURATION_MIN = 3.8;
-const SWIM_DURATION_MAX = 5.4;
 
 const ORGANIC_RADIUS_PRESETS = [
   "42% 58% 52% 48% / 48% 42% 58% 52%",
@@ -76,10 +62,6 @@ export function bubbleGeometry(seedKey: string): BubbleGeometry {
   return {
     borderRadius,
     tilt: Number(range(TILT_MIN, TILT_MAX).toFixed(2)),
-    translateY: Number(range(DRIFT_MIN, DRIFT_MAX).toFixed(1)),
-    translateX: Number(range(HORIZONTAL_DRIFT_MIN, HORIZONTAL_DRIFT_MAX).toFixed(1)),
-    swimDuration: Number(range(SWIM_DURATION_MIN, SWIM_DURATION_MAX).toFixed(2)),
-    swimDelay: Number(range(-1800, 0).toFixed(0)),
   };
 }
 

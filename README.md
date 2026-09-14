@@ -334,7 +334,7 @@ coffee owner ID.
 | `DELETE` | `/api/v1/admin/my-coffee/categories/:categoryId` | Delete category and cascade items |
 | `GET` | `/api/v1/admin/my-coffee/categories/:categoryId/items` | List category items |
 | `POST` | `/api/v1/admin/my-coffee/categories/:categoryId/items` | Create item |
-| `PATCH` | `/api/v1/admin/my-coffee/items/:itemId` | Edit item |
+| `PATCH` | `/api/v1/admin/my-coffee/items/:itemId` | Edit item, promotion, or availability |
 | `DELETE` | `/api/v1/admin/my-coffee/items/:itemId` | Delete item |
 
 ## Category bubbles
@@ -399,6 +399,12 @@ shows a re-login message rather than rendering the wrong coffee.
 The menu tab supports category and item CRUD. Categories support optional image
 selection, local preview, backend upload, and replacement. Items are loaded lazily for the
 selected category. The settings tab edits coffee name, logo, and slug. The
+
+Coffee admins can edit each item's regular price, optional promotional price,
+and availability. Promotional prices must be greater than zero and lower than
+the regular price; clearing the field removes the promotion. Unavailable items
+remain in the database and admin list, but the public menu marks them
+`Indisponible` and does not present a promotional price as active. The settings tab edits coffee name, logo, and slug. The
 security tab changes the coffee PIN. The top bar provides logout and a link to
 the public menu.
 
