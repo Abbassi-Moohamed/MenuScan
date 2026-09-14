@@ -36,16 +36,21 @@ export function BrandIntro({
   const resolvedMenuTitle = menuTitle ?? (categoriesCount != null ? dict.explore.title : undefined);
   const hasCounts = categoriesCount != null || itemsCount != null;
   const isCoffeeMenu = Boolean(logo || cover || categoriesCount != null);
+  const resolvedLogo = logo || (isCoffeeMenu ? "/icon.svg" : undefined);
 
   return (
     <section className={`brand-intro${isCoffeeMenu ? " brand-intro--coffee" : ""}`}>
       <div className="container">
-        {isCoffeeMenu && cover ? (
+        {isCoffeeMenu ? (
           <div
-            className="brand-intro__cover"
-            style={{
-              backgroundImage: `linear-gradient(rgb(34 24 18 / 0.2), rgb(34 24 18 / 0.58)), url("${cover}")`,
-            }}
+            className={`brand-intro__cover${cover ? "" : " brand-intro__cover--fallback"}`}
+            style={
+              cover
+                ? {
+                    backgroundImage: `linear-gradient(rgb(34 24 18 / 0.2), rgb(34 24 18 / 0.58)), url("${cover}")`,
+                  }
+                : undefined
+            }
           >
             {onReset ? (
               <button
@@ -58,15 +63,15 @@ export function BrandIntro({
                 <span aria-hidden="true">↻</span>
               </button>
             ) : null}
-            {logo ? (
+            {resolvedLogo ? (
               <div className="brand-intro__logo">
-                <Image src={logo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
+                <Image src={resolvedLogo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
               </div>
             ) : null}
           </div>
-        ) : logo ? (
+        ) : resolvedLogo ? (
           <div className="brand-intro__logo brand-intro__logo--standalone">
-            <Image src={logo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
+            <Image src={resolvedLogo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
           </div>
         ) : null}
         {!isCoffeeMenu || eyebrow ? <p className="brand-intro__eyebrow">{eyebrow ?? dict.explore.eyebrow}</p> : null}

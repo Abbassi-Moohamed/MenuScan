@@ -29,7 +29,7 @@ export default async function CoffeePage({ params }: CoffeePageProps) {
   const coffee = await resolvePublicCoffee(slug);
 
   return (
-    <div id="top">
+    <div id="top" className="menu-page">
       <main id="main">
         <MenuScene
           name={coffee.name}

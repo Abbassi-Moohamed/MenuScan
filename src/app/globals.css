@@ -310,6 +310,38 @@ img {
   place-items: end center;
 }
 
+.brand-intro__cover--fallback {
+  background:
+    radial-gradient(55% 80% at 18% 20%, rgb(194 84 31 / 0.5), transparent 68%),
+    radial-gradient(60% 75% at 88% 82%, rgb(37 99 89 / 0.42), transparent 70%),
+    linear-gradient(135deg, #3b2a1b 0%, #7c2d12 48%, #183b3a 100%);
+}
+
+.brand-intro__cover--fallback::before,
+.brand-intro__cover--fallback::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.brand-intro__cover--fallback::before {
+  width: 18rem;
+  height: 18rem;
+  right: -6rem;
+  top: -8rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  box-shadow: 0 0 0 2rem rgb(255 255 255 / 0.04), 0 0 0 4rem rgb(255 255 255 / 0.03);
+}
+
+.brand-intro__cover--fallback::after {
+  width: 11rem;
+  height: 11rem;
+  left: -4rem;
+  bottom: -5rem;
+  background: rgb(255 255 255 / 0.08);
+}
+
 .brand-intro::before {
   content: "";
   position: absolute;
@@ -1010,6 +1042,26 @@ img {
 /* Keep the fixed footer from covering the final menu content. */
 #main {
   padding-bottom: 4.25rem;
+}
+
+.menu-page {
+  min-height: calc(100svh - var(--header-height));
+}
+
+.menu-page #main {
+  min-height: calc(100svh - var(--header-height));
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-page #main .brand-intro {
+  flex: none;
+}
+
+.menu-page .bubble-field {
+  flex: 1 1 auto;
+  min-height: 24rem;
+  padding-bottom: 4.75rem;
 }
 
 /* ---------------------------------------------------------------- */
