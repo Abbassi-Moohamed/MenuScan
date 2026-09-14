@@ -263,6 +263,26 @@ img {
   overflow: hidden;
 }
 
+.brand-intro--coffee {
+  padding-top: 0;
+}
+
+.brand-intro--coffee .container {
+  padding-inline: 0;
+  max-width: none;
+}
+
+.brand-intro__cover {
+  position: relative;
+  width: 100%;
+  height: clamp(12rem, 58vw, 20rem);
+  background-position: center;
+  background-size: cover;
+  border-radius: 0 0 1.25rem 1.25rem;
+  display: grid;
+  place-items: end center;
+}
+
 .brand-intro::before {
   content: "";
   position: absolute;
@@ -759,39 +779,59 @@ img {
 /* ---------------------------------------------------------------- */
 
 .site-footer {
-  margin-top: 2.5rem;
-  padding: 1.6rem 0 2.2rem;
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 35;
+  min-height: 3.35rem;
+  padding: 0.55rem 0 calc(0.55rem + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-line);
-  background: var(--color-cream-100);
+  background: color-mix(in srgb, var(--color-cream-50) 94%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 -0.25rem 1rem rgb(43 30 18 / 0.06);
 }
 
 .site-footer__inner {
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem 0.75rem;
+  min-height: 2.25rem;
+  text-align: center;
 }
 
-.site-footer__brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: var(--color-espresso-900);
-}
-
-.site-footer__note {
-  font-size: 0.82rem;
+.site-footer__sales {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  line-height: 1.25;
   color: var(--color-mocha-500);
-  max-inline-size: 46ch;
 }
 
-.site-footer__note strong {
+.site-footer__sales-line,
+.site-footer__sales-credit {
+  white-space: nowrap;
+}
+
+.site-footer__sales strong {
   color: var(--color-espresso-700);
   font-weight: 600;
 }
 
-.site-footer__meta {
-  font-size: 0.75rem;
-  color: var(--color-mocha-400);
+@media (max-width: 26rem) {
+  .site-footer__sales {
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+}
+
+/* Keep the fixed footer from covering the final menu content. */
+#main {
+  padding-bottom: 4.25rem;
 }
 
 /* ---------------------------------------------------------------- */
@@ -800,14 +840,19 @@ img {
 
 .brand-intro__logo {
   position: relative;
-  width: 4.5rem;
-  height: 4.5rem;
-  margin-bottom: 1rem;
+  width: clamp(4.75rem, 22vw, 6.25rem);
+  height: clamp(4.75rem, 22vw, 6.25rem);
+  margin-bottom: calc(clamp(4.75rem, 22vw, 6.25rem) / -2);
   border-radius: var(--radius-full);
-  border: 1px solid var(--color-line);
+  border: clamp(0.25rem, 1.5vw, 0.4rem) solid var(--color-cream-50);
   background: var(--color-cream-100);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 0.5rem 1.25rem rgb(43 30 18 / 0.2);
   overflow: hidden;
+  z-index: 1;
+}
+
+.brand-intro__logo--standalone {
+  margin: 0 0 1rem;
 }
 
 .brand-intro__logo-img {
@@ -821,6 +866,77 @@ img {
   margin-top: 0.7rem;
   font-size: 0.92rem;
   color: var(--color-mocha-400);
+}
+
+.brand-intro--coffee .brand-intro__title,
+.brand-intro--coffee .brand-intro__menu {
+  margin-inline: clamp(1rem, 5vw, 2rem);
+}
+
+.brand-intro--coffee .brand-intro__title {
+  margin-top: clamp(3.25rem, 15vw, 4.25rem);
+  font-size: clamp(2rem, 9vw, 3.25rem);
+  overflow-wrap: anywhere;
+}
+
+.menu-card {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  min-width: 8.5rem;
+  min-height: 2.35rem;
+  padding: 0.42rem 0.9rem 0.44rem 1.15rem;
+  border: 1px solid rgb(180 83 9 / 0.2);
+  border-radius: 0.8rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.7), transparent 65%),
+    var(--color-cream-100);
+  box-shadow:
+    0 0.25rem 0.7rem rgb(43 30 18 / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.75);
+  transform: rotate(-1deg);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.menu-card::before {
+  content: "";
+  position: absolute;
+  left: 0.62rem;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: var(--color-amber-600);
+  box-shadow: 0 0 0 0.2rem var(--color-amber-100);
+}
+
+.site-header__brand:hover .menu-card {
+  transform: rotate(0deg) translateY(-1px);
+  box-shadow:
+    0 0.35rem 0.9rem rgb(43 30 18 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.8);
+}
+
+.menu-card__title {
+  color: var(--color-espresso-900);
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@media (min-width: 48rem) {
+  .brand-intro--coffee .container {
+    max-width: 64rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  .brand-intro__cover {
+    height: clamp(18rem, 36vw, 24rem);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
 }
 
 /* ---------------------------------------------------------------- */

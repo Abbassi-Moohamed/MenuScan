@@ -74,7 +74,7 @@ export default function RootLayout({
         </PublicChrome>
         {children}
         <PublicChrome>
-          <Footer dict={dict} />
+          <Footer />
           <BackToTop label={dict.backToTop.label} />
         </PublicChrome>
       </body>

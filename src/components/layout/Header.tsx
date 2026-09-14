@@ -10,12 +10,8 @@ export function Header({ dict }: HeaderProps) {
     <header className="site-header">
       <div className="container site-header__inner">
         <a className="site-header__brand" href="#top" aria-label={siteConfig.name}>
-          <span className="brand-mark" aria-hidden="true">
-            {siteConfig.name.charAt(0)}
-          </span>
-          <span className="brand-text">
-            <span className="brand-name">{siteConfig.name}</span>
-            <span className="brand-tagline">Menu numérique</span>
+          <span className="menu-card" aria-hidden="true">
+            <span className="menu-card__title">Menu Digitale</span>
           </span>
         </a>
         <span className="site-header__spacer" aria-hidden="true" />

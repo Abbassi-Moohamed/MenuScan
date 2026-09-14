@@ -33,16 +33,30 @@ export function BrandIntro({
   const dict = getDictionary();
   const resolvedMenuTitle = menuTitle ?? (categoriesCount != null ? dict.explore.title : undefined);
   const hasCounts = categoriesCount != null || itemsCount != null;
+  const isCoffeeMenu = Boolean(logo || cover || categoriesCount != null);
 
   return (
-    <section className="brand-intro" style={cover ? { backgroundImage: `linear-gradient(rgb(34 24 18 / 0.58), rgb(34 24 18 / 0.72)), url("${cover}")` } : undefined}>
+    <section className={`brand-intro${isCoffeeMenu ? " brand-intro--coffee" : ""}`}>
       <div className="container">
-        {logo ? (
-          <div className="brand-intro__logo">
-            <Image src={logo} alt="" fill sizes="4.5rem" className="brand-intro__logo-img" />
+        {isCoffeeMenu && cover ? (
+          <div
+            className="brand-intro__cover"
+            style={{
+              backgroundImage: `linear-gradient(rgb(34 24 18 / 0.2), rgb(34 24 18 / 0.58)), url("${cover}")`,
+            }}
+          >
+            {logo ? (
+              <div className="brand-intro__logo">
+                <Image src={logo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
+              </div>
+            ) : null}
+          </div>
+        ) : logo ? (
+          <div className="brand-intro__logo brand-intro__logo--standalone">
+            <Image src={logo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
           </div>
         ) : null}
-        <p className="brand-intro__eyebrow">{eyebrow ?? dict.explore.eyebrow}</p>
+        {!isCoffeeMenu || eyebrow ? <p className="brand-intro__eyebrow">{eyebrow ?? dict.explore.eyebrow}</p> : null}
         <h1 className="brand-intro__title">
           {name}
           <span className="brand-intro__title-accent">.</span>
