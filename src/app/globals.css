@@ -1198,6 +1198,55 @@ img {
   overflow: hidden;
 }
 
+@media (max-width: 47.99rem) {
+  .menu-page #main {
+    height: auto;
+    min-height: calc(100svh - var(--header-height));
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .menu-page .bubble-field {
+    flex: none;
+    height: auto;
+    min-height: 22rem;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .menu-page .bubble-row {
+    flex: 0 0 10rem;
+  }
+
+  .menu-page .bubble-row--1 {
+    flex-basis: 11rem;
+  }
+
+  .menu-page .bubble-row--1 .bubble,
+  .menu-page .bubble-row--1 .bubble-drag-layer {
+    flex-basis: clamp(10rem, 64vw, 13rem);
+  }
+
+  .menu-page .bubble-row--2 .bubble,
+  .menu-page .bubble-row--2 .bubble-drag-layer {
+    flex-basis: clamp(8.25rem, 43vw, 10.5rem);
+  }
+
+  .menu-page .bubble-row--3 .bubble,
+  .menu-page .bubble-row--3 .bubble-drag-layer {
+    flex-basis: clamp(6.25rem, 30vw, 8.25rem);
+  }
+
+  .menu-page .bubble {
+    max-height: 10rem;
+    padding-inline: 0.65rem;
+  }
+
+  .menu-page .bubble__name {
+    font-size: 0.98rem;
+  }
+}
+
 /* ---------------------------------------------------------------- */
 /* Brand intro: logo (coffee pages) & landing description            */
 /* ---------------------------------------------------------------- */
