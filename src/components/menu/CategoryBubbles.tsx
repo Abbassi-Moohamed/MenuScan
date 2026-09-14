@@ -12,13 +12,14 @@ import { accentGradientStyle } from "./accentGradient";
 interface CategoryLinkProps {
   coffeeSlug: string;
   category: MenuCategory;
+  sequenceIndex: number;
 }
 
 /**
  * One organic bubble, now a real `<a>` — the whole coffee menu is server
  * rendered and every bubble deep-links to `/menuscan/:slug/:categName`.
  */
-function CategoryLink({ coffeeSlug, category }: CategoryLinkProps) {
+function CategoryLink({ coffeeSlug, category, sequenceIndex }: CategoryLinkProps) {
   const geometry = bubbleGeometry(category.id);
   const style = {
     flexGrow: CATEGORY_WEIGHT,
@@ -26,26 +27,31 @@ function CategoryLink({ coffeeSlug, category }: CategoryLinkProps) {
     borderRadius: geometry.borderRadius,
     "--bubble-tilt": `${geometry.tilt}deg`,
     "--bubble-drift": `${geometry.translateY}px`,
-    "--bubble-delay": `${Math.abs(geometry.translateY) * 120}ms`,
-    ...accentGradientStyle(categoryAccent(category.id)),
+    "--bubble-drift-x": `${geometry.translateX}px`,
+    "--bubble-duration": `${geometry.swimDuration}s`,
+    "--bubble-delay": `${geometry.swimDelay}ms`,
+    ...accentGradientStyle(categoryAccent(category.id, sequenceIndex)),
   } as CSSProperties;
 
   return (
     <Link
       href={categoryHref(coffeeSlug, category.name)}
-      className="bubble"
+      className={`bubble${category.image ? " bubble--with-image" : ""}`}
       style={style}
       aria-label={category.name}
     >
-      <span className="bubble__icon" aria-hidden="true">
-        {category.image ? (
-          // Remote category images are decorative; the category name remains the accessible label.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img className="bubble__image" src={category.image} alt="" />
-        ) : (
-          categoryIcon(category.id, category.name)
-        )}
-      </span>
+      {category.image ? (
+        <span
+          className="bubble__media"
+          style={{ backgroundImage: `url("${category.image}")` }}
+          aria-hidden="true"
+        />
+      ) : null}
+      {!category.image ? (
+        <span className="bubble__icon" aria-hidden="true">
+          {categoryIcon(category.id, category.name)}
+        </span>
+      ) : null}
       <span className="bubble__name">{category.name}</span>
     </Link>
   );
@@ -64,6 +70,7 @@ interface CategoryBubblesProps {
 export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps) {
   const dict = getDictionary();
   const rows = layoutBubbleRows(categories);
+  let sequenceIndex = 0;
 
   if (categories.length === 0) {
     return (
@@ -81,7 +88,12 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
       {rows.map((row, rowIndex) => (
         <div key={rowIndex} className={`bubble-row bubble-row--${row.length}`}>
           {row.map((category) => (
-            <CategoryLink key={category.id} coffeeSlug={coffeeSlug} category={category} />
+            <CategoryLink
+              key={category.id}
+              coffeeSlug={coffeeSlug}
+              category={category}
+              sequenceIndex={sequenceIndex++}
+            />
           ))}
         </div>
       ))}

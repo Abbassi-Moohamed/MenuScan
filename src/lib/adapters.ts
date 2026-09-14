@@ -18,29 +18,29 @@ function hashString(input: string): number {
   return hash >>> 0;
 }
 
-/** Warm palette drawn from the existing coffee design tokens. */
+/** Deliberately separated palette so neighboring categories stay distinct. */
 const ACCENT_PALETTE = [
   "#b45309",
-  "#9a3412",
   "#0e7490",
-  "#3f6212",
-  "#be123c",
-  "#713f12",
-  "#4d7c0f",
-  "#a16207",
-  "#7c2d12",
-  "#155e75",
-  "#ea580c",
+  "#7c3aed",
   "#166534",
-  "#9d174d",
-  "#57534e",
-  "#c2541f",
+  "#be123c",
+  "#ea580c",
+  "#2563eb",
   "#854d0e",
+  "#9d174d",
+  "#4d7c0f",
+  "#9333ea",
+  "#c2410c",
+  "#0891b2",
+  "#be185d",
+  "#3f6212",
 ] as const;
 
-/** Stable accent per category, derived from its unique backend id. */
-export function categoryAccent(categoryId: string): string {
-  return ACCENT_PALETTE[hashString(categoryId) % ACCENT_PALETTE.length];
+/** Stable accent per category, with positional spacing for adjacent bubbles. */
+export function categoryAccent(categoryId: string, sequenceIndex = 0): string {
+  const baseIndex = hashString(categoryId) % 4;
+  return ACCENT_PALETTE[(baseIndex + sequenceIndex * 4) % ACCENT_PALETTE.length];
 }
 
 const FALLBACK_ICONS = ["🌿", "🫘", "🥤", "🍩", "🧁", "🍪", "🍯", "🥜"] as const;

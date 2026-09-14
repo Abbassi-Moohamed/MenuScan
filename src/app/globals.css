@@ -415,7 +415,27 @@ img {
   isolation: isolate;
   overflow: hidden;
   transition: filter 180ms ease, box-shadow 180ms ease;
-  animation: bubble-swim 6s ease-in-out var(--bubble-delay, 0ms) infinite;
+  animation: bubble-swim var(--bubble-duration, 4.5s) ease-in-out var(--bubble-delay, 0ms) infinite;
+}
+
+.bubble__media {
+  position: absolute;
+  inset: 0 0 2.7rem;
+  background-position: center;
+  background-size: cover;
+  opacity: 1;
+  transform: scale(1.04);
+  transition: transform 300ms ease, opacity 300ms ease;
+  z-index: -1;
+}
+
+.bubble__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(20 12 7 / 0.04), rgb(20 12 7 / 0.16)),
+    linear-gradient(135deg, rgb(255 255 255 / 0.12), transparent 55%);
 }
 
 .bubble::before {
@@ -446,14 +466,6 @@ img {
   filter: saturate(0.85);
 }
 
-.bubble__image {
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 999px;
-  object-fit: cover;
-  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.55);
-}
-
 .bubble__name {
   font-family: var(--font-display);
   font-weight: 700;
@@ -463,6 +475,24 @@ img {
   text-shadow: 0 1px 6px rgb(30 21 13 / 0.25);
   line-height: 1.1;
   overflow-wrap: anywhere;
+}
+
+.bubble--with-image {
+  background: var(--color-cream-50);
+  border: 1px solid rgb(43 30 18 / 0.1);
+}
+
+.bubble--with-image .bubble__name {
+  position: absolute;
+  inset: auto 0 0;
+  min-height: 2.7rem;
+  display: grid;
+  place-items: center;
+  padding: 0.45rem 0.7rem 0.55rem;
+  color: var(--color-espresso-900);
+  background: var(--color-cream-50);
+  text-shadow: none;
+  z-index: 1;
 }
 
 .bubble__count {
@@ -488,18 +518,29 @@ img {
     filter: brightness(1.06);
     box-shadow: 0 10px 28px rgb(43 30 18 / 0.22);
     animation-play-state: paused;
-    transform: rotate(var(--bubble-tilt)) translateY(calc(var(--bubble-drift) - 3px)) scale(1.02);
+    transform: rotate(var(--bubble-tilt))
+      translate(
+        calc(var(--bubble-drift-x) + 1px),
+        calc(var(--bubble-drift) - 3px)
+      )
+      scale(1.02);
+  }
+
+  .bubble:hover .bubble__media {
+    opacity: 1;
+    transform: scale(1.1);
   }
 }
 
 @keyframes bubble-swim {
   0%,
   100% {
-    transform: rotate(var(--bubble-tilt)) translateY(var(--bubble-drift));
+    transform: rotate(var(--bubble-tilt))
+      translate(var(--bubble-drift-x), var(--bubble-drift));
   }
   50% {
     transform: rotate(calc(var(--bubble-tilt) * -0.55))
-      translateY(calc(var(--bubble-drift) - 5px));
+      translate(calc(var(--bubble-drift-x) * -1), calc(var(--bubble-drift) - 7px));
   }
 }
 
