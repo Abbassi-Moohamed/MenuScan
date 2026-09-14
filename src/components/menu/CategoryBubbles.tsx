@@ -16,7 +16,7 @@ interface CategoryLinkProps {
   coffeeSlug: string;
   category: MenuCategory;
   visualIndex: number;
-  offset: { x: number; y: number };
+  position?: { x: number; y: number; width: number; height: number };
   onDragStart: (event: PointerEvent<HTMLAnchorElement>) => void;
   onDragMove: (event: PointerEvent<HTMLAnchorElement>) => void;
   onDragEnd: (event: PointerEvent<HTMLAnchorElement>) => void;
@@ -32,7 +32,7 @@ function CategoryLink({
   coffeeSlug,
   category,
   visualIndex,
-  offset,
+  position,
   onDragStart,
   onDragMove,
   onDragEnd,
@@ -65,7 +65,17 @@ function CategoryLink({
   return (
     <div
       className={`bubble-drag-layer${dragging ? " bubble-drag-layer--active" : ""}`}
-      style={{ transform: `translate3d(${offset.x}px, ${offset.y}px, 0)` }}
+      style={
+        position
+          ? {
+              position: "absolute",
+              left: position.x,
+              top: position.y,
+              width: position.width,
+              height: position.height,
+            }
+          : undefined
+      }
     >
       <Link
         href={categoryHref(coffeeSlug, category.name)}
@@ -106,48 +116,65 @@ interface CategoryBubblesProps {
 export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps) {
   const dict = getDictionary();
   const rows = layoutBubbleRows(categories);
-  const [offsets, setOffsets] = useState<Record<string, { x: number; y: number }>>({});
+  const [positions, setPositions] = useState<
+    Record<string, { x: number; y: number; width: number; height: number }>
+  >({});
   const dragRef = useRef<{
     id: string;
     pointerId: number;
     startX: number;
     startY: number;
-    originX: number;
-    originY: number;
+    grabX: number;
+    grabY: number;
+    sceneLeft: number;
+    sceneTop: number;
+    sceneWidth: number;
+    sceneHeight: number;
+    bubbleWidth: number;
+    bubbleHeight: number;
     moved: boolean;
   } | null>(null);
   const suppressClickRef = useRef(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const getSceneRange = (event: PointerEvent<HTMLAnchorElement>) => {
+  const getScene = (event: PointerEvent<HTMLAnchorElement>) => {
     const scene = event.currentTarget.closest(".bubble-field");
     if (!scene || typeof window === "undefined") {
-      return { x: 64, y: 48 };
+      return null;
     }
 
     const bounds = scene.getBoundingClientRect();
-    const isMobile = window.innerWidth < 768;
-    const maxX = isMobile ? 150 : 260;
-    const maxY = isMobile ? 220 : 340;
-
-    return {
-      // Every bubble receives the same scene-wide range, independent of row.
-      x: Math.max(48, Math.min(maxX, bounds.width / 2 - 16)),
-      y: Math.max(48, Math.min(maxY, bounds.height / 2 - 32)),
-    };
+    return { element: scene, bounds };
   };
 
   const handleDragStart = (id: string, event: PointerEvent<HTMLAnchorElement>) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    const current = offsets[id] ?? { x: 0, y: 0 };
+    const scene = getScene(event);
+    if (!scene) return;
+    const bubble = event.currentTarget.getBoundingClientRect();
     dragRef.current = {
       id,
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      originX: current.x,
-      originY: current.y,
+      grabX: event.clientX - bubble.left,
+      grabY: event.clientY - bubble.top,
+      sceneLeft: scene.bounds.left,
+      sceneTop: scene.bounds.top,
+      sceneWidth: scene.bounds.width,
+      sceneHeight: scene.bounds.height,
+      bubbleWidth: bubble.width,
+      bubbleHeight: bubble.height,
       moved: false,
     };
+    setPositions((current) => ({
+      ...current,
+      [id]: {
+        x: bubble.left - scene.bounds.left,
+        y: bubble.top - scene.bounds.top,
+        width: bubble.width,
+        height: bubble.height,
+      },
+    }));
     setDraggingId(id);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -155,19 +182,22 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
   const handleDragMove = (event: PointerEvent<HTMLAnchorElement>) => {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
-    const deltaX = event.clientX - drag.startX;
-    const deltaY = event.clientY - drag.startY;
-    if (Math.hypot(deltaX, deltaY) > 6) {
+    const nextX = event.clientX - drag.sceneLeft - drag.grabX;
+    const nextY = event.clientY - drag.sceneTop - drag.grabY;
+    if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 6) {
       drag.moved = true;
       suppressClickRef.current = true;
     }
     if (!drag.moved) return;
-    const range = getSceneRange(event);
-    setOffsets((current) => ({
+    const maxX = Math.max(0, drag.sceneWidth - drag.bubbleWidth);
+    const maxY = Math.max(0, drag.sceneHeight - drag.bubbleHeight);
+    setPositions((current) => ({
       ...current,
       [drag.id]: {
-        x: Math.max(-range.x, Math.min(range.x, drag.originX + deltaX)),
-        y: Math.max(-range.y, Math.min(range.y, drag.originY + deltaY)),
+        x: Math.max(0, Math.min(maxX, nextX)),
+        y: Math.max(0, Math.min(maxY, nextY)),
+        width: drag.bubbleWidth,
+        height: drag.bubbleHeight,
       },
     }));
   };
@@ -207,7 +237,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
             coffeeSlug={coffeeSlug}
             category={category}
             visualIndex={rowIndex * 3 + categoryIndex}
-            offset={offsets[category.id] ?? { x: 0, y: 0 }}
+            position={positions[category.id]}
             onDragStart={(event) => handleDragStart(category.id, event)}
             onDragMove={handleDragMove}
             onDragEnd={handleDragEnd}

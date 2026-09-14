@@ -424,16 +424,22 @@ img {
 
 .bubble-field {
   position: relative;
+  width: 100%;
   max-width: 30rem;
+  box-sizing: border-box;
   margin-inline: auto;
   padding: 0.25rem 1.125rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  overflow: visible;
+  gap: 0.75rem;
+  overflow: hidden;
 }
 
 .bubble-row {
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -442,6 +448,7 @@ img {
 .bubble-drag-layer {
   flex: 1 1 0%;
   min-width: 0;
+  height: 100%;
   touch-action: none;
   user-select: none;
   cursor: grab;
@@ -473,6 +480,7 @@ img {
 
 .bubble-drag-layer .bubble {
   width: 100%;
+  height: 100%;
 }
 
 .bubble-row--1 {
@@ -509,7 +517,8 @@ img {
   position: relative;
   flex: 1 1 0%;
   min-width: 0;
-  min-height: 8.25rem;
+  height: min(100%, 11.5rem);
+  min-height: 0;
   max-height: 11.5rem;
   display: flex;
   flex-direction: column;
@@ -527,6 +536,7 @@ img {
   isolation: isolate;
   overflow: hidden;
   transition: filter 180ms ease, box-shadow 180ms ease;
+  will-change: transform, box-shadow;
   animation:
     bubble-swim var(--bubble-duration, 4.5s) ease-in-out var(--bubble-delay, 0ms) infinite,
     bubble-border-glow 4.8s ease-in-out var(--bubble-delay, 0ms) infinite;
@@ -665,6 +675,41 @@ img {
 @media (prefers-reduced-motion: reduce) {
   .bubble {
     animation: none;
+  }
+
+  @media (max-width: 30rem) {
+    .bubble-field {
+      padding-inline: 0.75rem;
+    }
+
+    .bubble-row {
+      gap: 0.5rem;
+    }
+
+    .bubble-row--1 .bubble,
+    .bubble-row--1 .bubble-drag-layer {
+      flex-basis: clamp(9rem, 58vw, 12rem);
+    }
+
+    .bubble-row--2 .bubble,
+    .bubble-row--2 .bubble-drag-layer {
+      flex-basis: clamp(7.25rem, 42vw, 10rem);
+    }
+
+    .bubble-row--3 .bubble,
+    .bubble-row--3 .bubble-drag-layer {
+      flex-basis: clamp(5.75rem, 29vw, 8rem);
+    }
+
+    .bubble {
+      height: 100%;
+      max-height: 8.5rem;
+      padding-inline: 0.5rem;
+    }
+
+    .bubble__name {
+      font-size: 0.92rem;
+    }
   }
 }
 
@@ -1049,9 +1094,11 @@ img {
 }
 
 .menu-page #main {
-  min-height: calc(100svh - var(--header-height));
+  height: calc(100svh - var(--header-height));
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .menu-page #main .brand-intro {
@@ -1060,8 +1107,10 @@ img {
 
 .menu-page .bubble-field {
   flex: 1 1 auto;
-  min-height: 24rem;
+  min-height: 0;
+  height: auto;
   padding-bottom: 4.75rem;
+  overflow: hidden;
 }
 
 /* ---------------------------------------------------------------- */
