@@ -53,7 +53,7 @@ function CategoryLink({
     "--bubble-swim-y2": `${geometry.swimY2}px`,
     "--bubble-swim-x3": `${geometry.swimX3}px`,
     "--bubble-swim-y3": `${geometry.swimY3}px`,
-    "--bubble-duration": "4.2s",
+    "--bubble-duration": "6.8s",
     "--bubble-delay": `${visualIndex * -320}ms`,
     "--bubble-overlay": categoryAccentAt(visualIndex + 5),
     "--bubble-border": categoryAccentAt(visualIndex + 9),
