@@ -31,6 +31,33 @@
   --header-height: 3.75rem;
 }
 
+.brand-intro__reset {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  border-radius: var(--radius-full);
+  color: var(--color-cream-100);
+  background: rgb(30 21 13 / 0.32);
+  box-shadow: 0 0.25rem 0.75rem rgb(30 21 13 / 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 1.35rem;
+  line-height: 1;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.brand-intro__reset:hover {
+  transform: rotate(-35deg) scale(1.05);
+  background: rgb(180 83 9 / 0.72);
+  box-shadow: 0 0.35rem 1rem rgb(30 21 13 / 0.28);
+}
+
 *,
 *::before,
 *::after {
@@ -364,18 +391,56 @@ img {
 /* ---------------------------------------------------------------- */
 
 .bubble-field {
+  position: relative;
   max-width: 30rem;
   margin-inline: auto;
   padding: 0.25rem 1.125rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
+  overflow: visible;
 }
 
 .bubble-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.bubble-drag-layer {
+  flex: 1 1 0%;
+  min-width: 0;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  will-change: transform;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+
+.bubble-drag-layer--active {
+  z-index: 3;
+  transition: none;
+  cursor: grabbing;
+}
+
+.bubble-drag-layer--active .bubble {
+  animation-play-state: paused;
+  cursor: grabbing;
+  filter: brightness(1.08) saturate(1.08);
+  box-shadow:
+    var(--shadow-pop),
+    0 0 0 4px color-mix(in srgb, var(--bubble-border, #ffffff) 80%, transparent),
+    0 0.75rem 1.5rem rgb(30 21 13 / 0.22);
+  transform: scale(1.04) rotate(var(--bubble-tilt));
+}
+
+.bubble-drag-layer:has(.bubble:active) {
+  z-index: 3;
+}
+
+.bubble-drag-layer .bubble {
+  width: 100%;
 }
 
 .bubble-row--1 {
@@ -386,11 +451,23 @@ img {
   flex: 0 1 clamp(10.5rem, 58vw, 14rem);
 }
 
+.bubble-row--1 .bubble-drag-layer {
+  flex: 0 1 clamp(10.5rem, 58vw, 14rem);
+}
+
 .bubble-row--2 .bubble {
   flex: 0 1 clamp(9.5rem, 42vw, 13rem);
 }
 
+.bubble-row--2 .bubble-drag-layer {
+  flex: 0 1 clamp(9.5rem, 42vw, 13rem);
+}
+
 .bubble-row--3 .bubble {
+  flex: 0 1 clamp(7.5rem, 29vw, 10.5rem);
+}
+
+.bubble-row--3 .bubble-drag-layer {
   flex: 0 1 clamp(7.5rem, 29vw, 10.5rem);
 }
 
@@ -503,6 +580,10 @@ img {
 .bubble:focus-visible {
   outline: 3px solid var(--color-amber-600);
   outline-offset: 3px;
+}
+
+.bubble:active {
+  cursor: grabbing;
 }
 
 @media (hover: hover) {

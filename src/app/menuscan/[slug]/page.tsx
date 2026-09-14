@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-import { BrandIntro } from "@/components/menu/BrandIntro";
-import { CategoryBubbles } from "@/components/menu/CategoryBubbles";
+import { MenuScene } from "@/components/menu/MenuScene";
 import { toMenuCategory } from "@/lib/adapters";
 import { getCoffeeBySlug } from "@/lib/api";
 import { resolvePublicCoffee } from "@/lib/public-coffee";
@@ -32,13 +31,13 @@ export default async function CoffeePage({ params }: CoffeePageProps) {
   return (
     <div id="top">
       <main id="main">
-        <BrandIntro
+        <MenuScene
           name={coffee.name}
           logo={coffee.logo}
           cover={coffee.cover}
-          categoriesCount={coffee.categories.length}
+          coffeeSlug={slug}
+          categories={coffee.categories.map(toMenuCategory)}
         />
-        <CategoryBubbles coffeeSlug={slug} categories={coffee.categories.map(toMenuCategory)} />
       </main>
     </div>
   );

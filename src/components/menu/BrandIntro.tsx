@@ -18,6 +18,7 @@ interface BrandIntroProps {
   categoriesCount?: number;
   /** Number of items, shown next to the menu title when known. */
   itemsCount?: number;
+  onReset?: () => void;
 }
 
 export function BrandIntro({
@@ -29,6 +30,7 @@ export function BrandIntro({
   menuTitle,
   categoriesCount,
   itemsCount,
+  onReset,
 }: BrandIntroProps) {
   const dict = getDictionary();
   const resolvedMenuTitle = menuTitle ?? (categoriesCount != null ? dict.explore.title : undefined);
@@ -45,6 +47,17 @@ export function BrandIntro({
               backgroundImage: `linear-gradient(rgb(34 24 18 / 0.2), rgb(34 24 18 / 0.58)), url("${cover}")`,
             }}
           >
+            {onReset ? (
+              <button
+                type="button"
+                className="brand-intro__reset"
+                onClick={onReset}
+                aria-label="Réinitialiser la position des catégories"
+                title="Réinitialiser la scène"
+              >
+                <span aria-hidden="true">↻</span>
+              </button>
+            ) : null}
             {logo ? (
               <div className="brand-intro__logo">
                 <Image src={logo} alt="" fill sizes="5.5rem" className="brand-intro__logo-img" />
