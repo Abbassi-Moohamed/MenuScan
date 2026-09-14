@@ -93,6 +93,9 @@ export interface Dictionary {
       namePlaceholder: string;
       logo: string;
       logoPlaceholder: string;
+      logoHint: string;
+      logoPreview: string;
+      logoUploadFailed: string;
       slug: string;
       slugHint: string;
       slugInvalid: string;
@@ -152,6 +155,8 @@ export interface Dictionary {
       pricePlaceholder: string;
       image: string;
       imagePlaceholder: string;
+      imagePreview: string;
+      uploadFailed: string;
       imageHint: string;
       nameRequired: string;
       priceInvalid: string;

@@ -4,6 +4,7 @@ import type {
   AdminCategoryDto,
   AdminCoffeeDto,
   AdminItemDto,
+  AdminImageDto,
   ApiEnvelope,
   CoffeeDto,
   CreateCoffeeBody,
@@ -35,7 +36,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!headers.has("Accept")) {
     headers.set("Accept", "application/json");
   }
-  if (init.body !== undefined && !headers.has("Content-Type")) {
+  const isMultipartBody =
+    typeof FormData !== "undefined" && init.body instanceof FormData;
+  if (init.body !== undefined && !isMultipartBody && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
@@ -89,6 +92,17 @@ function authHeader(token: string): Record<string, string> {
 
 function jsonBody(value: unknown): RequestInit {
   return { body: JSON.stringify(value) };
+}
+
+/** POST /api/v1/admin/images — the browser sends files only to MENU SCAN. */
+export async function uploadImage(token: string, file: File): Promise<AdminImageDto> {
+  const form = new FormData();
+  form.append("file", file);
+  return request<AdminImageDto>("/admin/images", {
+    method: "POST",
+    headers: authHeader(token),
+    body: form,
+  });
 }
 
 /** POST /api/v1/admin/auth/app */

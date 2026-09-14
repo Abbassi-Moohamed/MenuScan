@@ -96,6 +96,12 @@ export interface AdminItemDto {
   updatedAt: string;
 }
 
+/** POST /api/v1/admin/images response. */
+export interface AdminImageDto {
+  imageId: string;
+  url: string;
+}
+
 /** Bodies accepted by the app-admin coffee endpoints. */
 export interface CreateCoffeeBody {
   name: string;

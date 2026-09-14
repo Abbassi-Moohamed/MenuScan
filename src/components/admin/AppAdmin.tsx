@@ -20,6 +20,7 @@ import {
   loginAppAdmin,
   resetCoffeePin,
   updateCoffee,
+  uploadImage,
 } from "@/lib/api";
 import type { AdminCoffeeDto } from "@/types/backend";
 
@@ -266,6 +267,7 @@ export function AppAdmin() {
           busy={formBusy}
           error={formError}
           onSubmit={form.mode === "create" ? handleCreate : handleUpdate}
+          onUpload={(file) => uploadImage(token, file).then((image) => image.url)}
           onCancel={() => {
             setForm(null);
             setFormError(null);

@@ -18,6 +18,7 @@ import {
   updateMyCategory,
   updateMyItem,
   updateMyCoffee,
+  uploadImage,
 } from "@/lib/api";
 import type { AdminCategoryDto, AdminCoffeeDto, AdminItemDto } from "@/types/backend";
 import { cn } from "@/lib/utils";
@@ -333,6 +334,8 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
     }
   };
 
+  const uploadForSession = (file: File) => uploadImage(token!, file).then((image) => image.url);
+
   const handleItemDelete = async () => {
     if (!token || !itemDelete) return;
     setItemDeleteBusy(true);
@@ -550,6 +553,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
                   busy={itemFormBusy}
                   error={itemFormError}
                   onSubmit={handleItemSave}
+                  onUpload={uploadForSession}
                   onCancel={() => {
                     setItemForm(null);
                     setItemFormError(null);
@@ -590,6 +594,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
               error={settingsError}
               hideCancel
               onSubmit={handleSettingsSave}
+              onUpload={uploadForSession}
               onCancel={() => setSettingsError(null)}
             />
           </section>

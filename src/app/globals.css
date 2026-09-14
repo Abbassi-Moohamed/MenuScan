@@ -1417,6 +1417,15 @@ img {
   color: var(--color-mocha-400);
 }
 
+.admin-upload-preview {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  background: var(--color-cream-100);
+}
+
 .admin-notice {
   display: flex;
   flex-direction: column;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { Dictionary } from "@/i18n/dictionary";
 import { isHttpUrl } from "@/lib/validators";
@@ -24,6 +24,7 @@ interface CoffeeFormProps {
   /** Hide the cancel button (e.g. when the form fills a whole panel). */
   hideCancel?: boolean;
   onSubmit: (values: CoffeeFormValues) => Promise<void>;
+  onUpload: (file: File) => Promise<string>;
   onCancel: () => void;
 }
 
@@ -40,6 +41,7 @@ export function CoffeeForm({
   error,
   hideCancel,
   onSubmit,
+  onUpload,
   onCancel,
 }: CoffeeFormProps) {
   const t = dict.admin.coffeeForm;
@@ -47,8 +49,16 @@ export function CoffeeForm({
   const [logo, setLogo] = useState(initial?.logo ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState(initial?.logo ?? "");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  useEffect(() => () => {
+    if (preview.startsWith("blob:")) URL.revokeObjectURL(preview);
+  }, [preview]);
+
+  const handleSubmit = async () => {
+    if (submitting) return;
     const trimmedName = name.trim();
     const trimmedLogo = logo.trim();
     const trimmedSlug = slug.trim();
@@ -57,7 +67,7 @@ export function CoffeeForm({
       setFieldError(t.nameRequired);
       return;
     }
-    if (trimmedLogo.length === 0 || !isHttpUrl(trimmedLogo)) {
+    if (!file && (trimmedLogo.length === 0 || !isHttpUrl(trimmedLogo))) {
       setFieldError(t.logoRequired);
       return;
     }
@@ -67,15 +77,23 @@ export function CoffeeForm({
     }
 
     setFieldError(null);
-    void onSubmit({
-      name: trimmedName,
-      logo: trimmedLogo,
-      slug: mode === "edit" && trimmedSlug.length > 0 ? trimmedSlug : undefined,
-    });
+    setSubmitting(true);
+    try {
+      const uploadedLogo = file ? await onUpload(file) : trimmedLogo;
+      await onSubmit({
+        name: trimmedName,
+        logo: uploadedLogo,
+        slug: mode === "edit" && trimmedSlug.length > 0 ? trimmedSlug : undefined,
+      });
+    } catch (error) {
+      setFieldError(error instanceof Error ? error.message : t.logoUploadFailed);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <section className={cn("admin-form", busy && "admin-form--disabled")} aria-busy={busy}>
+    <section className={cn("admin-form", (busy || submitting) && "admin-form--disabled")} aria-busy={busy || submitting}>
       <div className="admin-form__head">
         <h3 className="admin-form__title">{title}</h3>
       </div>
@@ -87,7 +105,7 @@ export function CoffeeForm({
           type="text"
           value={name}
           placeholder={t.namePlaceholder}
-          disabled={busy}
+          disabled={busy || submitting}
           onChange={(event) => setName(event.target.value)}
         />
       </label>
@@ -96,13 +114,32 @@ export function CoffeeForm({
         <span className="admin-field__label">{t.logo}</span>
         <input
           className="admin-field__input"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          disabled={busy || submitting}
+          onChange={(event) => {
+            const selected = event.target.files?.[0] ?? null;
+            if (!selected) return;
+            if (preview.startsWith("blob:")) URL.revokeObjectURL(preview);
+            setFile(selected);
+            setPreview(URL.createObjectURL(selected));
+          }}
+        />
+        {preview ? (
+          // Blob previews cannot be passed through next/image's remote loader.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="admin-upload-preview" src={preview} alt={t.logoPreview} />
+        ) : null}
+        <input
+          className="admin-field__input"
           type="url"
           inputMode="url"
           value={logo}
           placeholder={t.logoPlaceholder}
-          disabled={busy}
+          disabled={busy || submitting}
           onChange={(event) => setLogo(event.target.value)}
         />
+        <span className="admin-field__hint">{t.logoHint}</span>
       </label>
 
       {mode === "edit" ? (
@@ -113,7 +150,7 @@ export function CoffeeForm({
             type="text"
             value={slug}
             placeholder={initial?.slug ?? ""}
-            disabled={busy}
+            disabled={busy || submitting}
             onChange={(event) => setSlug(event.target.value)}
           />
           <span className="admin-field__hint">{t.slugHint}</span>
@@ -133,12 +170,12 @@ export function CoffeeForm({
 
       <div className="admin-form__actions">
         {hideCancel ? null : (
-          <button type="button" className="admin-btn admin-btn--ghost" disabled={busy} onClick={onCancel}>
+          <button type="button" className="admin-btn admin-btn--ghost" disabled={busy || submitting} onClick={onCancel}>
             {t.cancel}
           </button>
         )}
-        <button type="button" className="admin-btn admin-btn--primary" disabled={busy} onClick={handleSubmit}>
-          {busy ? t.saving : t.save}
+        <button type="button" className="admin-btn admin-btn--primary" disabled={busy || submitting} onClick={() => void handleSubmit()}>
+          {busy || submitting ? t.saving : t.save}
         </button>
       </div>
     </section>
