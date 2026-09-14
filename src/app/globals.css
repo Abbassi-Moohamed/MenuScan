@@ -1118,10 +1118,8 @@ img {
 /* ---------------------------------------------------------------- */
 
 .site-footer {
-  position: fixed;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 35;
+  position: relative;
+  z-index: 1;
   min-height: 3.35rem;
   padding: 0.55rem 0 calc(0.55rem + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-line);
@@ -1168,9 +1166,8 @@ img {
   }
 }
 
-/* Keep the fixed footer from covering the final menu content. */
 #main {
-  padding-bottom: 4.25rem;
+  padding-bottom: 0;
 }
 
 .menu-page {
@@ -1178,11 +1175,11 @@ img {
 }
 
 .menu-page #main {
-  height: calc(100svh - var(--header-height));
-  min-height: 0;
+  min-height: calc(100svh - var(--header-height));
+  height: auto;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .menu-page #main .brand-intro {
@@ -1192,7 +1189,7 @@ img {
 .menu-page .bubble-field {
   flex: 0 1 auto;
   min-height: 0;
-  max-height: 100%;
+  max-height: none;
   margin-top: clamp(0.75rem, 3vw, 1.5rem);
   padding-bottom: 4.75rem;
   overflow: hidden;
@@ -1200,7 +1197,6 @@ img {
 
 @media (max-width: 47.99rem) {
   .menu-page #main {
-    height: auto;
     min-height: calc(100svh - var(--header-height));
     overflow-x: hidden;
     overflow-y: auto;
