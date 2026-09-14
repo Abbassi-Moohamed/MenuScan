@@ -32,10 +32,20 @@ export interface BubbleGeometry {
   borderRadius: string;
   /** Slight rotation in degrees to break the grid. */
   tilt: number;
+  swimX1: number;
+  swimY1: number;
+  swimX2: number;
+  swimY2: number;
+  swimX3: number;
+  swimY3: number;
 }
 
 const TILT_MIN = -3.5;
 const TILT_MAX = 3.5;
+const SWIM_X_MIN = -16;
+const SWIM_X_MAX = 16;
+const SWIM_Y_MIN = 2;
+const SWIM_Y_MAX = 40;
 
 const ORGANIC_RADIUS_PRESETS = [
   "42% 58% 52% 48% / 48% 42% 58% 52%",
@@ -62,6 +72,12 @@ export function bubbleGeometry(seedKey: string): BubbleGeometry {
   return {
     borderRadius,
     tilt: Number(range(TILT_MIN, TILT_MAX).toFixed(2)),
+    swimX1: Number(range(SWIM_X_MIN, SWIM_X_MAX).toFixed(1)),
+    swimY1: Number(range(SWIM_Y_MIN, SWIM_Y_MAX).toFixed(1)),
+    swimX2: Number(range(SWIM_X_MIN, SWIM_X_MAX).toFixed(1)),
+    swimY2: Number(range(SWIM_Y_MIN, SWIM_Y_MAX).toFixed(1)),
+    swimX3: Number(range(SWIM_X_MIN, SWIM_X_MAX).toFixed(1)),
+    swimY3: Number(range(SWIM_Y_MIN, SWIM_Y_MAX).toFixed(1)),
   };
 }
 

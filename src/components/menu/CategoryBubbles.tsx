@@ -22,6 +22,7 @@ interface CategoryLinkProps {
   onDragEnd: (event: PointerEvent<HTMLAnchorElement>) => void;
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
   dragging: boolean;
+  isLastTouched: boolean;
 }
 
 /**
@@ -38,6 +39,7 @@ function CategoryLink({
   onDragEnd,
   onClick,
   dragging,
+  isLastTouched,
 }: CategoryLinkProps) {
   const geometry = bubbleGeometry(category.id);
   const style = {
@@ -45,7 +47,13 @@ function CategoryLink({
     aspectRatio: CATEGORY_ASPECT.toFixed(3),
     borderRadius: geometry.borderRadius,
     "--bubble-tilt": `${geometry.tilt}deg`,
-    "--bubble-duration": "5.2s",
+    "--bubble-swim-x1": `${geometry.swimX1}px`,
+    "--bubble-swim-y1": `${geometry.swimY1}px`,
+    "--bubble-swim-x2": `${geometry.swimX2}px`,
+    "--bubble-swim-y2": `${geometry.swimY2}px`,
+    "--bubble-swim-x3": `${geometry.swimX3}px`,
+    "--bubble-swim-y3": `${geometry.swimY3}px`,
+    "--bubble-duration": "4.2s",
     "--bubble-delay": `${visualIndex * -320}ms`,
     "--bubble-overlay": categoryAccentAt(visualIndex + 5),
     "--bubble-border": categoryAccentAt(visualIndex + 9),
@@ -62,8 +70,8 @@ function CategoryLink({
   return (
     <div
       className={`bubble-drag-layer${dragging ? " bubble-drag-layer--active" : ""}`}
-      style={
-        position
+      style={{
+        ...(position
           ? {
               position: "absolute",
               left: position.x,
@@ -71,8 +79,9 @@ function CategoryLink({
               width: position.width,
               height: position.height,
             }
-          : undefined
-      }
+          : {}),
+        zIndex: isLastTouched ? 1003 : 1001,
+      }}
     >
       <Link
         href={categoryHref(coffeeSlug, category.name)}
@@ -133,6 +142,8 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
   } | null>(null);
   const suppressClickRef = useRef(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [hasDragged, setHasDragged] = useState(false);
+  const [lastTouchedId, setLastTouchedId] = useState<string | null>(null);
   const getScene = (event: PointerEvent<HTMLAnchorElement>) => {
     const scene = event.currentTarget.closest(".bubble-field");
     if (!scene || typeof window === "undefined") {
@@ -147,6 +158,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
     if (event.pointerType === "mouse" && event.button !== 0) return;
     const scene = getScene(event);
     if (!scene) return;
+    setLastTouchedId(id);
     const bubble = event.currentTarget.getBoundingClientRect();
     dragRef.current = {
       id,
@@ -183,6 +195,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
             height: drag.bubbleHeight,
           },
         }));
+        setHasDragged(true);
       }
       drag.moved = true;
       suppressClickRef.current = true;
@@ -228,7 +241,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
 
   return (
     <nav
-      className={`bubble-field bubble-field--rows-${Math.min(rows.length, 4)}`}
+      className={`bubble-field bubble-field--rows-${Math.min(rows.length, 4)}${hasDragged ? " bubble-field--paused" : ""}`}
       aria-label={dict.explore.categoriesAriaLabel}
     >
       {rows.map((row, rowIndex) => (
@@ -245,6 +258,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
             onDragEnd={handleDragEnd}
             onClick={handleClick}
             dragging={draggingId === category.id}
+            isLastTouched={lastTouchedId === category.id}
           />
         ))}
         </div>
