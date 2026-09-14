@@ -15,6 +15,8 @@ interface AdminLayoutProps {
   logo?: string | null;
   /** Optional public menu link (coffee admin). */
   publicMenuHref?: string;
+  /** Optional header controls rendered beside the public menu and logout actions. */
+  headerActions?: React.ReactNode;
   onLogout: () => void;
   children: React.ReactNode;
 }
@@ -29,6 +31,7 @@ export function AdminLayout({
   subtitle,
   logo,
   publicMenuHref,
+  headerActions,
   onLogout,
   children,
 }: AdminLayoutProps) {
@@ -60,6 +63,7 @@ export function AdminLayout({
             <button type="button" className="admin-bar__link admin-bar__link--logout" onClick={onLogout}>
               {dict.admin.chrome.logout}
             </button>
+            {headerActions}
           </div>
         </div>
       </header>

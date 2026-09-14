@@ -196,6 +196,7 @@ export interface Dictionary {
       menu: string;
       orders: string;
       settings: string;
+      profile: string;
       security: string;
     };
     orders: {

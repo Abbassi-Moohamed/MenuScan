@@ -203,8 +203,9 @@ export const fr: Dictionary = {
     navigation: {
       menu: "Menu",
       orders: "Commandes",
-      settings: "Café",
-      security: "Code / Sécurité",
+      settings: "Paramètres",
+      profile: "Profil",
+      security: "Sécurité",
     },
     orders: {
       title: "Commandes",

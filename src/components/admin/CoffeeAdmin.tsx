@@ -36,7 +36,7 @@ import { ItemList } from "./ItemList";
 import { OrdersSection } from "./OrdersSection";
 
 type AsyncStatus = "idle" | "loading" | "ready" | "error";
-type View = "menu" | "orders" | "settings" | "security";
+type View = "menu" | "orders" | "profile" | "security";
 type CategoryFormState = { mode: "create" } | { mode: "edit"; category: AdminCategoryDto } | null;
 type ItemFormState = { mode: "create" } | { mode: "edit"; item: AdminItemDto } | null;
 
@@ -84,7 +84,8 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
   const [coffeeError, setCoffeeError] = useState<string | null>(null);
   const [wrongCoffee, setWrongCoffee] = useState(false);
 
-  const [view, setView] = useState<View>("menu");
+  const [view, setView] = useState<View>("orders");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   const [categories, setCategories] = useState<AdminCategoryDto[] | null>(null);
@@ -431,6 +432,44 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
       subtitle={d.chrome.roleCoffee}
       logo={coffee?.logo}
       publicMenuHref={`/menuscan/${coffeeSlug}`}
+      headerActions={
+        <div className="admin-header-settings">
+          <button
+            type="button"
+            className={cn(
+              "admin-bar__link admin-settings-button",
+              (view === "profile" || view === "security") && "admin-settings-button--active",
+            )}
+            aria-label={d.navigation.settings}
+            title={d.navigation.settings}
+            aria-expanded={settingsOpen}
+            aria-haspopup="menu"
+            onClick={() => setSettingsOpen((open) => !open)}
+          >
+            <span aria-hidden="true">⚙</span>
+          </button>
+          {settingsOpen ? (
+            <div className="admin-tabs__dropdown admin-header-settings__dropdown" role="menu">
+              {(["profile", "security"] as const).map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="menuitem"
+                  className={cn("admin-tabs__option", view === id && "admin-tabs__option--active")}
+                  onClick={() => {
+                    setView(id);
+                    setSettingsOpen(false);
+                    setCategoryForm(null);
+                    setItemForm(null);
+                  }}
+                >
+                  {d.navigation[id]}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      }
       onLogout={() => {
         clearSession();
         setSession(null);
@@ -443,14 +482,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
       ) : null}
 
       <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>
-        {(
-          [
-            ["menu", d.navigation.menu],
-            ["orders", d.navigation.orders],
-            ["settings", d.navigation.settings],
-            ["security", d.navigation.security],
-          ] as const
-        ).map(([id, label]) => (
+        {(["orders", "menu"] as const).map((id) => (
           <button
             key={id}
             type="button"
@@ -459,11 +491,12 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
             className={cn("admin-tabs__tab", view === id && "admin-tabs__tab--active")}
             onClick={() => {
               setView(id);
+              setSettingsOpen(false);
               setCategoryForm(null);
               setItemForm(null);
             }}
           >
-            {label}
+            {d.navigation[id]}
           </button>
         ))}
       </nav>
@@ -608,7 +641,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
         </>
       ) : view === "orders" ? (
         <OrdersSection token={token} />
-      ) : view === "settings" ? (
+      ) : view === "profile" ? (
         coffee ? (
           <section className="admin-section">
             <div className="admin-head">
