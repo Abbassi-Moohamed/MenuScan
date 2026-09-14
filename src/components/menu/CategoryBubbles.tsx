@@ -23,6 +23,7 @@ interface CategoryLinkProps {
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
   dragging: boolean;
   isLastTouched: boolean;
+  pressed: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ function CategoryLink({
   onClick,
   dragging,
   isLastTouched,
+  pressed,
 }: CategoryLinkProps) {
   const geometry = bubbleGeometry(category.id);
   const style = {
@@ -85,7 +87,7 @@ function CategoryLink({
     >
       <Link
         href={categoryHref(coffeeSlug, category.name)}
-        className="bubble"
+        className={`bubble${pressed ? " bubble--pressed" : ""}`}
         style={style}
         aria-label={`${category.name}. Faites glisser pour déplacer.`}
         onPointerDown={onDragStart}
@@ -144,6 +146,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [hasDragged, setHasDragged] = useState(false);
   const [lastTouchedId, setLastTouchedId] = useState<string | null>(null);
+  const [pressedId, setPressedId] = useState<string | null>(null);
   const getScene = (event: PointerEvent<HTMLAnchorElement>) => {
     const scene = event.currentTarget.closest(".bubble-field");
     if (!scene || typeof window === "undefined") {
@@ -158,7 +161,9 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
     if (event.pointerType === "mouse" && event.button !== 0) return;
     const scene = getScene(event);
     if (!scene) return;
+    suppressClickRef.current = false;
     setLastTouchedId(id);
+    setPressedId(id);
     const bubble = event.currentTarget.getBoundingClientRect();
     dragRef.current = {
       id,
@@ -218,6 +223,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
     if (dragRef.current?.pointerId === event.pointerId) {
       dragRef.current = null;
       setDraggingId(null);
+      setPressedId(null);
     }
   };
 
@@ -259,6 +265,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
             onClick={handleClick}
             dragging={draggingId === category.id}
             isLastTouched={lastTouchedId === category.id}
+            pressed={pressedId === category.id}
           />
         ))}
         </div>
