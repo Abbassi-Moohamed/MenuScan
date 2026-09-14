@@ -32,7 +32,11 @@ const API_VERSION_PREFIX = "/api/v1";
  * Core request helper shared by the public API and the admin API. Backend
  * responses always use the `{ success, data | message }` envelope.
  */
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function requestWithToken<T>(
+  path: string,
+  init: RequestInit = {},
+  token?: string,
+): Promise<T> {
   const headers = new Headers(init.headers);
   if (!headers.has("Accept")) {
     headers.set("Accept", "application/json");
@@ -43,9 +47,11 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
+  const requestHeaders = new Headers(headers);
+  if (token) requestHeaders.set("Authorization", `Bearer ${token}`);
   const response = await fetch(`${apiConfig.baseUrl}${API_VERSION_PREFIX}${path}`, {
     ...init,
-    headers,
+    headers: requestHeaders,
     cache: "no-store",
   });
 
@@ -69,6 +75,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body.data;
 }
 
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  return requestWithToken<T>(path, init);
+}
+
 /* ------------------------------------------------------------------------ */
 /* Public menu API                                                           */
 /* ------------------------------------------------------------------------ */
@@ -88,7 +98,7 @@ export function getItemsByCategoryId(categoryId: string): Promise<ItemDto[]> {
 /* ------------------------------------------------------------------------ */
 
 function authHeader(token: string): Record<string, string> {
-  return { Authorization: `Bearer ${token}` };
+  return { Authorization: "Bearer " + token };
 }
 
 function jsonBody(value: unknown): RequestInit {

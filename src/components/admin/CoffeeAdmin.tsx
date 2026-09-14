@@ -33,9 +33,10 @@ import { ChangePinForm } from "./ChangePinForm";
 import { CoffeeForm, type CoffeeFormValues } from "./CoffeeForm";
 import { ItemForm, type ItemFormValues } from "./ItemForm";
 import { ItemList } from "./ItemList";
+import { OrdersSection } from "./OrdersSection";
 
 type AsyncStatus = "idle" | "loading" | "ready" | "error";
-type View = "menu" | "settings" | "security";
+type View = "menu" | "orders" | "settings" | "security";
 type CategoryFormState = { mode: "create" } | { mode: "edit"; category: AdminCategoryDto } | null;
 type ItemFormState = { mode: "create" } | { mode: "edit"; item: AdminItemDto } | null;
 
@@ -444,6 +445,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
         {(
           [
             ["menu", d.navigation.menu],
+            ["orders", d.navigation.orders],
             ["settings", d.navigation.settings],
             ["security", d.navigation.security],
           ] as const
@@ -603,6 +605,8 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
             </section>
           ) : null}
         </>
+      ) : view === "orders" ? (
+        <OrdersSection token={token} />
       ) : view === "settings" ? (
         coffee ? (
           <section className="admin-section">

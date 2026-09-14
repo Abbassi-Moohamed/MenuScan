@@ -1,6 +1,18 @@
 import type { Dictionary } from "./dictionary";
 
 export const fr: Dictionary = {
+  order: {
+    addToCart: "Ajouter à la commande", openCart: "Ouvrir la commande", closeCart: "Fermer",
+    cartTitle: "Votre commande", emptyCart: "Votre commande est vide.", decrease: "Diminuer",
+    increase: "Augmenter", total: "Total", tableNumber: "Numéro de table",
+    tablePlaceholder: "Ex. 12", submit: "Envoyer la commande", submitting: "Envoi…",
+    invalidCheckout: "Ajoutez un article disponible et indiquez votre numéro de table.",
+    submitError: "Impossible d'envoyer la commande.", statusLink: "Suivre une commande",
+    confirmationTitle: "Commande reçue !", confirmationMessage: "Le café a reçu votre commande.",
+    status: "État de la commande", statusPending: "En attente", statusConfirmed: "Confirmée",
+    statusRejected: "Refusée", statusReady: "Prête", statusCompleted: "Terminée",
+    refresh: "Actualiser", orderNotFound: "Commande introuvable.",
+  },
   header: {
     status: "Ouvert maintenant",
     statusTitle: "Ouvert aujourd'hui jusqu'à 18\u00A0h",
@@ -190,8 +202,21 @@ export const fr: Dictionary = {
     },
     navigation: {
       menu: "Menu",
+      orders: "Commandes",
       settings: "Café",
       security: "Code / Sécurité",
+    },
+    orders: {
+      title: "Commandes",
+      pending: "En attente",
+      confirmed: "Confirmées",
+      rejected: "Refusées",
+      ready: "Prêtes",
+      all: "Toutes",
+      empty: "Aucune commande.",
+      confirm: "Confirmer",
+      reject: "Refuser",
+      tableNumber: "Table",
     },
     settings: {
       title: "Informations du café",

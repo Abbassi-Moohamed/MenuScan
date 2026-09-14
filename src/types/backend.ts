@@ -148,3 +148,37 @@ export interface UpdateItemBody {
   isAvailable?: boolean;
   image?: string;
 }
+
+export type OrderStatus = "PENDING" | "CONFIRMED" | "REJECTED";
+
+export interface OrderLineDto {
+  itemId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export interface OrderDto {
+  id: string;
+  coffeeId: string;
+  tableNumber: number;
+  status: OrderStatus;
+  items: OrderLineDto[];
+  total: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateOrderBody {
+  coffeeSlug: string;
+  tableNumber: number;
+  items: Array<{ itemId: string; quantity: number }>;
+}
+
+export interface PaginatedOrdersDto {
+  orders: OrderDto[];
+  total: number;
+  page: number;
+  limit: number;
+}

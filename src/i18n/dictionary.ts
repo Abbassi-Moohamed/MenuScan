@@ -1,4 +1,12 @@
 export interface Dictionary {
+  order: {
+    addToCart: string; openCart: string; closeCart: string; cartTitle: string; emptyCart: string;
+    decrease: string; increase: string; total: string; tableNumber: string; tablePlaceholder: string;
+    submit: string; submitting: string; invalidCheckout: string; submitError: string; statusLink: string;
+    confirmationTitle: string; confirmationMessage: string; status: string; statusPending: string;
+    statusConfirmed: string; statusRejected: string; statusReady: string; statusCompleted: string;
+    refresh: string; orderNotFound: string;
+  };
   header: {
     status: string;
     statusTitle: string;
@@ -186,8 +194,21 @@ export interface Dictionary {
     };
     navigation: {
       menu: string;
+      orders: string;
       settings: string;
       security: string;
+    };
+    orders: {
+      title: string;
+      pending: string;
+      confirmed: string;
+      rejected: string;
+      ready: string;
+      all: string;
+      empty: string;
+      confirm: string;
+      reject: string;
+      tableNumber: string;
     };
     settings: {
       title: string;

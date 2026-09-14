@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { MenuItemCard } from "@/components/menu/MenuItemCard";
-import { siteConfig } from "@/config/site";
+import { OrderExperience } from "@/components/ordering/OrderExperience";
 import { getDictionary } from "@/i18n";
 import { toMenuItem } from "@/lib/adapters";
 import { ApiClientError, getCoffeeBySlug, getItemsByCategoryId } from "@/lib/api";
@@ -84,20 +83,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </div>
 
         {menuItems.length > 0 ? (
-          <div className="container">
-            <ul className="sheet__list">
-              {menuItems.map((item, index) => (
-                <li key={item.id} className="sheet__item">
-                  <MenuItemCard
-                    item={item}
-                    currency={siteConfig.currency}
-                    locale={siteConfig.locale}
-                    delay={index * 55}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
+          <OrderExperience coffeeSlug={slug} items={menuItems} />
         ) : (
           <div className="container">
             <div className="sheet-state">
