@@ -134,6 +134,12 @@ export interface Dictionary {
       name: string;
       namePlaceholder: string;
       nameRequired: string;
+      image: string;
+      imagePlaceholder: string;
+      imagePreview: string;
+      uploadFailed: string;
+      imageHint: string;
+      urlInvalid: string;
       saved: (name: string) => string;
     };
     items: {

@@ -217,10 +217,10 @@ flowchart TD
 | Type | Fields |
 | --- | --- |
 | `CoffeeDto` | `id`, `name`, `logo`, `slug`, `categories: CategoryDto[]` |
-| `CategoryDto` | `id`, `name` |
+| `CategoryDto` | `id`, `name`, `image: string \| null` |
 | `ItemDto` | `id`, `name`, `description: string \| null`, `price: number`, `image: string \| null` |
 | `AdminCoffeeDto` | `id`, `name`, `logo`, `slug`, `categoryCount`, `createdAt`, `updatedAt` |
-| `AdminCategoryDto` | `id`, `name`, `createdAt`, `updatedAt` |
+| `AdminCategoryDto` | `id`, `name`, `image: string \| null`, `createdAt`, `updatedAt` |
 | `AdminItemDto` | `id`, `name`, `description`, `price`, `image`, `itemCategoryId`, timestamps |
 
 All successful backend responses are expected to use
@@ -251,7 +251,8 @@ interface MenuItem {
 }
 ```
 
-`toMenuCategory` derives a stable accent and icon from the category ID/name.
+`toMenuCategory` derives a stable accent and fallback icon from the category
+ID/name. When a category image exists, the public category bubble displays it.
 Items are not embedded in the category adapter; they are fetched on demand.
 `toMenuItem` converts nullable API description/image values to the UI shape.
 
@@ -395,7 +396,8 @@ slug input accepts lowercase letters, numbers, and hyphens.
 coffee and verifies that its returned slug equals the route slug. A mismatch
 shows a re-login message rather than rendering the wrong coffee.
 
-The menu tab supports category and item CRUD. Items are loaded lazily for the
+The menu tab supports category and item CRUD. Categories support optional image
+selection, local preview, backend upload, and replacement. Items are loaded lazily for the
 selected category. The settings tab edits coffee name, logo, and slug. The
 security tab changes the coffee PIN. The top bar provides logout and a link to
 the public menu.

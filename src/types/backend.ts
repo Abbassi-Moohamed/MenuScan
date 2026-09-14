@@ -27,6 +27,7 @@ export type ApiEnvelope<T> = ApiSuccessEnvelope<T> | ApiErrorEnvelope;
 export interface CategoryDto {
   id: string;
   name: string;
+  image: string | null;
 }
 
 /** GET /api/v1/coffees/:coffeeSlug — the coffee with only its own categories. */
@@ -80,6 +81,7 @@ export interface AdminCoffeeDto {
 export interface AdminCategoryDto {
   id: string;
   name: string;
+  image: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -120,6 +122,11 @@ export interface CreateItemBody {
   name: string;
   description?: string;
   price: number;
+  image?: string;
+}
+
+export interface CategoryBody {
+  name: string;
   image?: string;
 }
 

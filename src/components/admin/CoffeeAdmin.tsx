@@ -255,17 +255,17 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
 
   /* ---- Menu tab: categories + items ------------------------------------- */
 
-  const handleCategorySave = async (name: string) => {
+  const handleCategorySave = async (values: { name: string; image?: string }) => {
     if (!token) return;
     setCategoryFormBusy(true);
     setCategoryFormError(null);
     try {
       if (categoryForm?.mode === "edit") {
-        const updated = await updateMyCategory(token, categoryForm.category.id, name);
+        const updated = await updateMyCategory(token, categoryForm.category.id, values);
         reloadCategories();
         setNotice(d.categories.saved(updated.name));
       } else {
-        const created = await createMyCategory(token, name);
+        const created = await createMyCategory(token, values);
         reloadCategories();
         setNotice(d.categories.saved(created.name));
       }
@@ -481,9 +481,11 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
                     : d.categories.editTitle
                 }
                 initialName={categoryForm.mode === "edit" ? categoryForm.category.name : undefined}
+                initialImage={categoryForm.mode === "edit" ? categoryForm.category.image : undefined}
                 busy={categoryFormBusy}
                 error={categoryFormError}
                 onSubmit={handleCategorySave}
+                onUpload={uploadForSession}
                 onCancel={() => {
                   setCategoryForm(null);
                   setCategoryFormError(null);

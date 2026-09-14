@@ -36,7 +36,13 @@ function CategoryLink({ coffeeSlug, category }: CategoryLinkProps) {
       aria-label={category.name}
     >
       <span className="bubble__icon" aria-hidden="true">
-        {categoryIcon(category.id, category.name)}
+        {category.image ? (
+          // Remote category images are decorative; the category name remains the accessible label.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="bubble__image" src={category.image} alt="" />
+        ) : (
+          categoryIcon(category.id, category.name)
+        )}
       </span>
       <span className="bubble__name">{category.name}</span>
     </Link>

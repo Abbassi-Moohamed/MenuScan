@@ -138,6 +138,12 @@ export const fr: Dictionary = {
       name: "Nom de la catégorie",
       namePlaceholder: "Ex. : Boissons froides",
       nameRequired: "Le nom est requis.",
+      image: "Image",
+      imagePlaceholder: "https://example.com/category.jpg",
+      imagePreview: "Aperçu de la catégorie",
+      uploadFailed: "Impossible d'envoyer l'image.",
+      imageHint: "Optionnel — le visuel apparaît dans le menu public.",
+      urlInvalid: "Cette URL n'est pas valide.",
       saved: (name) => `Catégorie « ${name} » enregistrée.`,
     },
     items: {

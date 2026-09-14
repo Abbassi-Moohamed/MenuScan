@@ -27,6 +27,7 @@ export interface MenuItem {
 export interface MenuCategory {
   id: string;
   name: string;
+  image?: string;
   /** Small glyph (emoji) used in navigation chips. */
   icon?: string;
   /** Accent color used across the category's visuals. */

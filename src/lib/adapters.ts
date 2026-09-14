@@ -76,6 +76,7 @@ export function toMenuCategory(category: CategoryDto): MenuCategory {
   return {
     id: category.id,
     name: category.name,
+    image: category.image ?? undefined,
     accent: categoryAccent(category.id),
     icon: categoryIcon(category.id, category.name),
     items: [],

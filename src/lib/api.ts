@@ -7,6 +7,7 @@ import type {
   AdminImageDto,
   ApiEnvelope,
   CoffeeDto,
+  CategoryBody,
   CreateCoffeeBody,
   CreateItemBody,
   ItemDto,
@@ -203,11 +204,11 @@ export function listMyCategories(token: string): Promise<AdminCategoryDto[]> {
 }
 
 /** POST /api/v1/admin/my-coffee/categories */
-export function createMyCategory(token: string, name: string): Promise<AdminCategoryDto> {
+export function createMyCategory(token: string, body: CategoryBody): Promise<AdminCategoryDto> {
   return request<AdminCategoryDto>("/admin/my-coffee/categories", {
     method: "POST",
     headers: authHeader(token),
-    ...jsonBody({ name }),
+    ...jsonBody(body),
   });
 }
 
@@ -215,12 +216,12 @@ export function createMyCategory(token: string, name: string): Promise<AdminCate
 export function updateMyCategory(
   token: string,
   categoryId: string,
-  name: string,
+  body: CategoryBody,
 ): Promise<AdminCategoryDto> {
   return request<AdminCategoryDto>(`/admin/my-coffee/categories/${encodeURIComponent(categoryId)}`, {
     method: "PATCH",
     headers: authHeader(token),
-    ...jsonBody({ name }),
+    ...jsonBody(body),
   });
 }
 
