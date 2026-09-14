@@ -378,12 +378,30 @@ img {
   gap: 0.75rem;
 }
 
+.bubble-row--1 {
+  justify-content: center;
+}
+
+.bubble-row--1 .bubble {
+  flex: 0 1 clamp(10.5rem, 58vw, 14rem);
+}
+
+.bubble-row--2 .bubble {
+  flex: 0 1 clamp(9.5rem, 42vw, 13rem);
+}
+
+.bubble-row--3 .bubble {
+  flex: 0 1 clamp(7.5rem, 29vw, 10.5rem);
+}
+
 .bubble {
   --art-from: #b45309;
   --art-to: #7c2d12;
   position: relative;
   flex: 1 1 0%;
   min-width: 0;
+  min-height: 8.25rem;
+  max-height: 11.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -395,7 +413,19 @@ img {
   background: linear-gradient(150deg, var(--art-from) 0%, var(--art-to) 100%);
   box-shadow: var(--shadow-pop);
   isolation: isolate;
+  overflow: hidden;
   transition: filter 180ms ease, box-shadow 180ms ease;
+  animation: bubble-swim 6s ease-in-out var(--bubble-delay, 0ms) infinite;
+}
+
+.bubble::before {
+  content: "";
+  position: absolute;
+  inset: 0.35rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .bubble::after {
@@ -403,7 +433,9 @@ img {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(95% 70% at 75% 10%, rgb(255 255 255 / 0.26), transparent 55%);
+  background:
+    radial-gradient(80% 65% at 78% 8%, rgb(255 255 255 / 0.3), transparent 58%),
+    linear-gradient(130deg, rgb(255 255 255 / 0.08), transparent 48%);
   pointer-events: none;
   z-index: -1;
 }
@@ -455,6 +487,25 @@ img {
   .bubble:hover {
     filter: brightness(1.06);
     box-shadow: 0 10px 28px rgb(43 30 18 / 0.22);
+    animation-play-state: paused;
+    transform: rotate(var(--bubble-tilt)) translateY(calc(var(--bubble-drift) - 3px)) scale(1.02);
+  }
+}
+
+@keyframes bubble-swim {
+  0%,
+  100% {
+    transform: rotate(var(--bubble-tilt)) translateY(var(--bubble-drift));
+  }
+  50% {
+    transform: rotate(calc(var(--bubble-tilt) * -0.55))
+      translateY(calc(var(--bubble-drift) - 5px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none;
   }
 }
 

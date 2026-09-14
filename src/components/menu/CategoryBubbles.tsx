@@ -24,7 +24,9 @@ function CategoryLink({ coffeeSlug, category }: CategoryLinkProps) {
     flexGrow: CATEGORY_WEIGHT,
     aspectRatio: CATEGORY_ASPECT.toFixed(3),
     borderRadius: geometry.borderRadius,
-    transform: `rotate(${geometry.tilt}deg) translateY(${geometry.translateY}px)`,
+    "--bubble-tilt": `${geometry.tilt}deg`,
+    "--bubble-drift": `${geometry.translateY}px`,
+    "--bubble-delay": `${Math.abs(geometry.translateY) * 120}ms`,
     ...accentGradientStyle(categoryAccent(category.id)),
   } as CSSProperties;
 
@@ -77,7 +79,7 @@ export function CategoryBubbles({ coffeeSlug, categories }: CategoryBubblesProps
   return (
     <nav className="bubble-field" aria-label={dict.explore.categoriesAriaLabel}>
       {rows.map((row, rowIndex) => (
-        <div key={rowIndex} className="bubble-row">
+        <div key={rowIndex} className={`bubble-row bubble-row--${row.length}`}>
           {row.map((category) => (
             <CategoryLink key={category.id} coffeeSlug={coffeeSlug} category={category} />
           ))}

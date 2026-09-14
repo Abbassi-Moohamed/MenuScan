@@ -36,14 +36,19 @@ export interface BubbleGeometry {
   translateY: number;
 }
 
-const HORIZONTAL_MIN = 0.34;
-const HORIZONTAL_MAX = 0.68;
-const VERTICAL_MIN = 0.42;
-const VERTICAL_MAX = 0.72;
 const TILT_MIN = -3.5;
 const TILT_MAX = 3.5;
 const DRIFT_MIN = -2;
 const DRIFT_MAX = 8;
+
+const ORGANIC_RADIUS_PRESETS = [
+  "42% 58% 52% 48% / 48% 42% 58% 52%",
+  "54% 46% 62% 38% / 44% 58% 42% 56%",
+  "46% 54% 38% 62% / 58% 44% 56% 42%",
+  "58% 42% 48% 52% / 52% 62% 38% 48%",
+  "50% 50% 60% 40% / 40% 56% 44% 60%",
+  "44% 56% 50% 50% / 60% 46% 54% 40%",
+] as const;
 
 /**
  * Generate a stable organic silhouette for a given seed key
@@ -52,13 +57,14 @@ const DRIFT_MAX = 8;
 export function bubbleGeometry(seedKey: string): BubbleGeometry {
   const random = mulberry32(fnv1a(`bubble:${seedKey}`));
   const range = (min: number, max: number) => min + random() * (max - min);
-  const percent = (min: number, max: number) => `${(range(min, max) * 100).toFixed(2)}%`;
+  const presetIndex = Math.floor(random() * ORGANIC_RADIUS_PRESETS.length);
 
-  const corners = Array.from({ length: 4 }, () => percent(HORIZONTAL_MIN, HORIZONTAL_MAX));
-  const verticals = Array.from({ length: 4 }, () => percent(VERTICAL_MIN, VERTICAL_MAX));
+  // Use restrained, curated silhouettes instead of independent corner values.
+  // This keeps the deformation organic without creating sharp or lopsided blobs.
+  const borderRadius = ORGANIC_RADIUS_PRESETS[presetIndex];
 
   return {
-    borderRadius: `${corners.join(" ")} / ${verticals.join(" ")}`,
+    borderRadius,
     tilt: Number(range(TILT_MIN, TILT_MAX).toFixed(2)),
     translateY: Number(range(DRIFT_MIN, DRIFT_MAX).toFixed(1)),
   };
@@ -68,31 +74,26 @@ export function bubbleGeometry(seedKey: string): BubbleGeometry {
 export const CATEGORY_WEIGHT = 1.0;
 export const CATEGORY_ASPECT = 1.12;
 
-/** Maximum combined weight per row before wrapping to a new row (≈3 per row). */
-const MAX_ROW_WEIGHT = 3.1;
-
 /**
- * Greedy "float" layout: pack categories into rows while each row's total
- * weight stays below `MAX_ROW_WEIGHT`, so rows fill with 2–3 bubbles.
+ * Distribute categories into balanced rows of at most three bubbles. This
+ * avoids a visually dominant final bubble, for example `2 + 2` instead of
+ * `3 + 1` for four categories.
  */
 export function layoutBubbleRows(categories: MenuCategory[]): MenuCategory[][] {
-  const rows: MenuCategory[][] = [];
-  let current: MenuCategory[] = [];
-  let weight = 0;
-
-  for (const category of categories) {
-    const nextWeight = CATEGORY_WEIGHT;
-    if (current.length > 0 && weight + nextWeight > MAX_ROW_WEIGHT) {
-      rows.push(current);
-      current = [];
-      weight = 0;
-    }
-    current.push(category);
-    weight += nextWeight;
+  if (categories.length === 0) {
+    return [];
   }
 
-  if (current.length > 0) {
-    rows.push(current);
+  const rowCount = Math.ceil(categories.length / 3);
+  const baseRowSize = Math.floor(categories.length / rowCount);
+  const largerRowCount = categories.length % rowCount;
+  const rows: MenuCategory[][] = [];
+  let offset = 0;
+
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+    const rowSize = baseRowSize + (rowIndex < largerRowCount ? 1 : 0);
+    rows.push(categories.slice(offset, offset + rowSize));
+    offset += rowSize;
   }
 
   return rows;
