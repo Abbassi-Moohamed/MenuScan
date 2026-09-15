@@ -79,6 +79,12 @@ export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelet
             </span>
           </span>
           <div className="item-row__actions" aria-label={`Actions pour ${item.name}`}>
+            <button type="button" className="row-action row-action--danger" onClick={() => onDelete(item)}>
+              {d.delete.confirm}
+            </button>
+            <button type="button" className="row-action" onClick={() => onEdit(item)}>
+              {d.items.edit}
+            </button>
             <button
               type="button"
               className={`row-action row-action--availability ${item.isAvailable ? "row-action--available" : "row-action--unavailable"}`}
@@ -89,12 +95,6 @@ export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelet
               onClick={() => onToggleAvailability(item)}
             >
               {item.isAvailable ? d.items.available : d.items.unavailable}
-            </button>
-            <button type="button" className="row-action" onClick={() => onEdit(item)}>
-              {d.items.edit}
-            </button>
-            <button type="button" className="row-action row-action--danger" onClick={() => onDelete(item)}>
-              {d.delete.confirm}
             </button>
           </div>
         </li>
