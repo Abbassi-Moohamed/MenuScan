@@ -16,18 +16,73 @@ export interface CreateItemBody { name: string; description?: string; price: num
 export type UpdateItemBody = Partial<CreateItemBody>;
 export interface CategoryBody { name: string; image?: string }
 export type OrderStatus = "PENDING" | "CONFIRMED" | "REJECTED";
+export type PaymentStatus = "UNPAID" | "PAID";
 export interface OrderLineDto { itemId: string; name: string; image: string | null; quantity: number; unitPrice: number; subtotal: number }
-export interface OrderDto { id: string; coffeeId: string; tableNumber: number; status: OrderStatus; items: OrderLineDto[]; total: number; createdAt: string; updatedAt: string }
-export interface CreateOrderBody { coffeeSlug: string; tableNumber: number; items: Array<{ itemId: string; quantity: number }> }
+export interface OrderDto { id: string; coffeeId: string; tableNumber: number; status: OrderStatus; paymentStatus: PaymentStatus; paidAt: string | null; paidBy: string | null; items: OrderLineDto[]; total: number; tableSessionId: string | null; serviceShiftId: string | null; sessionToken?: string; createdAt: string; updatedAt: string }
+export interface CreateOrderBody { coffeeSlug: string; tableNumber: number; items: Array<{ itemId: string; quantity: number }>; sessionToken?: string }
 export interface PaginatedOrdersDto { orders: OrderDto[]; total: number; page: number; limit: number }
+export type ServiceShiftStatus = "OPEN" | "CLOSED";
+export type ServiceShiftType = "MORNING" | "AFTERNOON" | "CUSTOM";
+export interface ServiceShiftSummary {
+  totalOrders: number;
+  paidOrders: number;
+  paidRevenue: number;
+  itemsSold: number;
+  tablesServed: number;
+}
+export interface ServiceShiftDto {
+  id: string;
+  coffeeId: string;
+  status: ServiceShiftStatus;
+  name: string | null;
+  type: ServiceShiftType;
+  label: string | null;
+  notes: string | null;
+  openedAt: string;
+  closedAt: string | null;
+  summary?: ServiceShiftSummary;
+}
+export interface TableSessionDto {
+  id: string;
+  coffeeId: string;
+  tableNumber: number;
+  serviceShiftId: string | null;
+  status: "ACTIVE" | "CLOSED";
+  openedAt: string;
+  closedAt: string | null;
+  lastOrderAt: string;
+  orderCount: number;
+  summary?: TableSessionSummary;
+}
+export interface TableSessionSummary {
+  totalOrders: number;
+  confirmedOrders: number;
+  pendingOrders: number;
+  rejectedOrders: number;
+  pendingRevenue: number;
+  confirmedRevenue: number;
+  paidRevenue: number;
+  outstandingRevenue: number;
+  itemsSold: number;
+  orders: TablePaymentOrderDto[];
+}
+export interface TablePaymentOrderDto {
+  id: string;
+  tableNumber: number;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  total: number;
+}
+export interface ServiceShiftListDto { shifts: ServiceShiftDto[]; total: number; page: number; limit: number }
+export interface TableSessionListDto { sessions: TableSessionDto[]; total: number; page: number; limit: number }
 export type AnalyticsRange = "today" | "yesterday" | "7d" | "30d" | "this-month" | "previous-month" | "custom";
-export interface AnalyticsQuery { from?: string; to?: string }
+export interface AnalyticsQuery { from?: string; to?: string; serviceShiftId?: string }
 export interface InsightComparison { current: number; previous: number; change: number; changePercent: number | null; trend: "up" | "down" | "flat" }
 export interface AnalyticsDto {
   scope: "coffee" | "platform"; timezone: "UTC";
   period: { from: string; to: string; granularity: "hour" | "day" | "week" | "month" };
   comparisonPeriod: { from: string; to: string };
-  kpis: { confirmedRevenue: InsightComparison; totalOrders: InsightComparison; confirmedOrders: InsightComparison; pendingOrders: number; rejectedOrders: number; averageConfirmedOrderValue: InsightComparison; itemsSold: InsightComparison };
+  kpis: { confirmedRevenue: InsightComparison; paidRevenue: InsightComparison; outstandingRevenue: InsightComparison; paymentRate: InsightComparison; totalOrders: InsightComparison; confirmedOrders: InsightComparison; pendingOrders: number; rejectedOrders: number; averageConfirmedOrderValue: InsightComparison; itemsSold: InsightComparison };
   revenueTrend: Array<{ bucket: string; revenue: number; orders: number }>;
   orderTrend: Array<{ bucket: string; revenue: number; orders: number }>;
   topItems: Array<{ itemId: string; name: string; quantitySold: number; revenue: number }>;

@@ -1,4 +1,4 @@
-import type { CreateOrderBody, OrderDto, OrderStatus, PaginatedOrdersDto } from "@/types/backend";
+import type { CreateOrderBody, OrderDto, OrderStatus, PaginatedOrdersDto, PaymentStatus } from "@/types/backend";
 import { requestWithToken } from "@/lib/api";
 
 export function createOrder(body: CreateOrderBody) {
@@ -9,9 +9,20 @@ export function getOrder(orderId: string) {
   return requestWithToken<OrderDto>(`/orders/${encodeURIComponent(orderId)}`);
 }
 
-export function listOrders(token: string, status?: OrderStatus) {
-  const query = status ? `?status=${status}` : "";
+export function listOrders(token: string, status?: OrderStatus, paymentStatus?: PaymentStatus) {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (paymentStatus) params.set("paymentStatus", paymentStatus);
+  const query = params.toString() ? `?${params.toString()}` : "";
   return requestWithToken<PaginatedOrdersDto>(`/admin/my-coffee/orders${query}`, {}, token);
+}
+
+export function markOrderPaid(token: string, orderId: string) {
+  return requestWithToken<OrderDto>(
+    `/admin/my-coffee/orders/${encodeURIComponent(orderId)}/payment`,
+    { method: "PATCH" },
+    token,
+  );
 }
 
 export function updateOrderStatus(token: string, orderId: string, status: OrderStatus) {

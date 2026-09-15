@@ -2,9 +2,10 @@ export interface Dictionary {
   order: {
     addToCart: string; openCart: string; closeCart: string; cartTitle: string;
     decrease: string; increase: string; total: string; tableNumber: string; tablePlaceholder: string; addedToCart: string; viewOrder: string;
-    submit: string; submitting: string; invalidCheckout: string; submitError: string;
+    submit: string; submitting: string; invalidCheckout: string; submitError: string; sessionInProgress: string; sessionExpired: string;
     confirmationTitle: string; confirmationMessage: string; status: string; statusPending: string;
     statusConfirmed: string; statusRejected: string; statusReady: string; statusCompleted: string;
+    paymentUnpaid: string; paymentPaid: string;
     refresh: string; orderNotFound: string;
   };
   landing: {
@@ -189,6 +190,8 @@ export interface Dictionary {
       saved: (name: string) => string;
     };
     navigation: {
+      service: string;
+      tables: string;
       menu: string;
       orders: string;
       insights: string;
@@ -212,6 +215,32 @@ export interface Dictionary {
     settings: {
       title: string;
       intro: string;
+    };
+    service: {
+      currentTitle: string;
+      openShift: string;
+      noShift: string;
+      morning: string;
+      afternoon: string;
+      startService: string;
+      closeService: string;
+      closeQuestion: string;
+      closeSummary: string;
+      cancel: string;
+      confirm: string;
+      opening: string;
+      closing: string;
+      history: string;
+      activeTables: string;
+      tableNumber: string;
+      tableSummary: string;
+      tableClosed: string;
+      statusOpen: string;
+      statusClosed: string;
+      ordersCount: (count: number) => string;
+      revenue: (value: number) => string;
+      tablesCount: (count: number) => string;
+      noCurrentShift: string;
     };
     pin: {
       title: string;
@@ -264,6 +293,9 @@ export interface Dictionary {
       confirmedOrders: string;
       itemsSold: string;
       revenue: string;
+      paidRevenue: string;
+      outstandingRevenue: string;
+      paymentRate: string;
       averageOrder: string;
       trend: string;
       topItems: string;

@@ -2,6 +2,9 @@
   "name": "menuscan",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "description": "A premium mobile-first digital coffee menu for cafés, optimized for QR-code access.",
   "scripts": {
     "dev": "next dev",

@@ -1,0 +1,50 @@
+export interface ActiveTableSession {
+  token: string;
+  tableNumber: number;
+  lastUpdatedAt: string;
+}
+
+export function tableSessionStorageKey(coffeeSlug: string) {
+  return `menuscan:table-session:${coffeeSlug}`;
+}
+
+export function readTableSession(coffeeSlug: string): ActiveTableSession | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(tableSessionStorageKey(coffeeSlug));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<ActiveTableSession>;
+    const tableNumberValue = parsed.tableNumber;
+    const normalizedTableNumber = typeof tableNumberValue === "number" ? tableNumberValue : Number(tableNumberValue);
+
+    if (!parsed.token || !Number.isInteger(normalizedTableNumber) || normalizedTableNumber < 1) {
+      return null;
+    }
+
+    return {
+      token: parsed.token,
+      tableNumber: normalizedTableNumber,
+      lastUpdatedAt: typeof parsed.lastUpdatedAt === "string" ? parsed.lastUpdatedAt : new Date().toISOString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function writeTableSession(coffeeSlug: string, session: ActiveTableSession) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(tableSessionStorageKey(coffeeSlug), JSON.stringify(session));
+  } catch {
+    // Local storage may be unavailable; the UI should recover gracefully.
+  }
+}
+
+export function clearTableSession(coffeeSlug: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(tableSessionStorageKey(coffeeSlug));
+  } catch {
+    // Ignore browser storage failures.
+  }
+}

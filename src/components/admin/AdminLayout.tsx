@@ -63,9 +63,11 @@ export function AdminLayout({
                 {dict.admin.chrome.viewPublicMenu}
               </Link>
             ) : null}
-            <button type="button" className="admin-bar__link admin-bar__link--logout" onClick={onLogout}>
-              {dict.admin.chrome.logout}
-            </button>
+            {!headerActions ? (
+              <button type="button" className="admin-bar__link admin-bar__link--logout" onClick={onLogout}>
+                {dict.admin.chrome.logout}
+              </button>
+            ) : null}
             {headerActions}
           </div>
         </div>

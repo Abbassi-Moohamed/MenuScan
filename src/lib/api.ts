@@ -13,6 +13,10 @@ import type {
   CreateCoffeeBody,
   CreateItemBody,
   ItemDto,
+  ServiceShiftDto,
+  ServiceShiftListDto,
+  TableSessionDto,
+  TableSessionListDto,
   UpdateCoffeeBody,
   UpdateItemBody,
 } from "@/types/backend";
@@ -20,11 +24,13 @@ import type {
 /** Operational error carrying the HTTP status of a failed backend response. */
 export class ApiClientError extends Error {
   readonly status: number;
+  readonly details: unknown;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, details?: unknown) {
     super(message);
     this.name = "ApiClientError";
     this.status = status;
+    this.details = details;
   }
 }
 
@@ -59,20 +65,22 @@ export async function requestWithToken<T>(
 
   if (!response.ok) {
     let message = "Request failed";
+    let details: unknown;
     try {
-      const body = (await response.json()) as Partial<{ message: string }>;
+      const body = (await response.json()) as Partial<{ message: string; details: unknown }>;
       if (typeof body.message === "string" && body.message.length > 0) {
         message = body.message;
       }
+      details = body.details;
     } catch {
       // Non-JSON payload — keep the generic message.
     }
-    throw new ApiClientError(response.status, message);
+    throw new ApiClientError(response.status, message, details);
   }
 
   const body = (await response.json()) as ApiEnvelope<T>;
   if (body.success !== true) {
-    throw new ApiClientError(response.status, body.message);
+    throw new ApiClientError(response.status, body.message, body.details);
   }
   return body.data;
 }
@@ -107,6 +115,7 @@ function analyticsQuery(query: AnalyticsQuery): string {
   const params = new URLSearchParams();
   if (query.from) params.set("from", query.from);
   if (query.to) params.set("to", query.to);
+  if (query.serviceShiftId) params.set("serviceShiftId", query.serviceShiftId);
   const value = params.toString();
   return value ? `?${value}` : "";
 }
@@ -310,6 +319,79 @@ export function updateMyItem(
 export function deleteMyItem(token: string, itemId: string): Promise<{ id: string }> {
   return request<{ id: string }>(`/admin/my-coffee/items/${encodeURIComponent(itemId)}`, {
     method: "DELETE",
+    headers: authHeader(token),
+  });
+}
+
+/** GET /api/v1/admin/my-coffee/service-shifts/current */
+export function getCurrentServiceShift(token: string): Promise<ServiceShiftDto | null> {
+  return request<ServiceShiftDto | null>("/admin/my-coffee/service-shifts/current", {
+    headers: authHeader(token),
+  });
+}
+
+/** POST /api/v1/admin/my-coffee/service-shifts/open */
+export function openServiceShift(
+  token: string,
+  input: { name?: string; type?: "MORNING" | "AFTERNOON" | "CUSTOM"; label?: string; notes?: string },
+): Promise<ServiceShiftDto> {
+  return request<ServiceShiftDto>("/admin/my-coffee/service-shifts/open", {
+    method: "POST",
+    headers: authHeader(token),
+    ...jsonBody(input),
+  });
+}
+
+/** POST /api/v1/admin/my-coffee/service-shifts/close */
+export function closeCurrentServiceShift(token: string): Promise<ServiceShiftDto> {
+  return request<ServiceShiftDto>("/admin/my-coffee/service-shifts/close", {
+    method: "POST",
+    headers: authHeader(token),
+  });
+}
+
+/** GET /api/v1/admin/my-coffee/service-shifts */
+export function listServiceShifts(
+  token: string,
+  status?: "OPEN" | "CLOSED",
+  page = 1,
+  limit = 50,
+): Promise<ServiceShiftListDto> {
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  params.set("page", String(page));
+  params.set("limit", String(limit));
+  return request<ServiceShiftListDto>(`/admin/my-coffee/service-shifts?${params.toString()}`, {
+    headers: authHeader(token),
+  });
+}
+
+/** GET /api/v1/admin/my-coffee/table-sessions */
+export function listTableSessions(
+  token: string,
+  options: { serviceShiftId?: string; status?: "ACTIVE" | "CLOSED"; page?: number; limit?: number } = {},
+): Promise<TableSessionListDto> {
+  const params = new URLSearchParams();
+  if (options.serviceShiftId) params.set("serviceShiftId", options.serviceShiftId);
+  if (options.status) params.set("status", options.status);
+  if (options.page) params.set("page", String(options.page));
+  if (options.limit) params.set("limit", String(options.limit));
+  return request<TableSessionListDto>(`/admin/my-coffee/table-sessions${params.size ? `?${params.toString()}` : ""}`, {
+    headers: authHeader(token),
+  });
+}
+
+/** GET /api/v1/admin/my-coffee/table-sessions/:sessionId */
+export function getTableSession(token: string, sessionId: string): Promise<TableSessionDto> {
+  return request<TableSessionDto>(`/admin/my-coffee/table-sessions/${encodeURIComponent(sessionId)}`, {
+    headers: authHeader(token),
+  });
+}
+
+/** PATCH /api/v1/admin/my-coffee/table-sessions/:sessionId/close */
+export function closeTableSession(token: string, sessionId: string): Promise<TableSessionDto> {
+  return request<TableSessionDto>(`/admin/my-coffee/table-sessions/${encodeURIComponent(sessionId)}/close`, {
+    method: "PATCH",
     headers: authHeader(token),
   });
 }

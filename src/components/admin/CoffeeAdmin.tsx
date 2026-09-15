@@ -21,6 +21,7 @@ import {
   updateMyCoffee,
   uploadImage,
   getCoffeeAnalytics,
+  listServiceShifts,
 } from "@/lib/api";
 import type { AdminCategoryDto, AdminCoffeeDto, AdminItemDto } from "@/types/backend";
 import { cn } from "@/lib/utils";
@@ -39,9 +40,28 @@ import { OrdersSection } from "./OrdersSection";
 import { InsightsDashboard } from "./InsightsDashboard";
 
 type AsyncStatus = "idle" | "loading" | "ready" | "error";
-type View = "menu" | "orders" | "profile" | "security";
+type View = "service" | "tables" | "orders" | "menu" | "profile" | "security";
 type CategoryFormState = { mode: "create" } | { mode: "edit"; category: AdminCategoryDto } | null;
 type ItemFormState = { mode: "create" } | { mode: "edit"; item: AdminItemDto } | null;
+
+function SettingsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M10.5 3.5h3l.7 2.3a6.7 6.7 0 0 1 1.8.9l2.2-1.1 2.1 2.1-1.1 2.2c.4.6.7 1.2.9 1.8l2.3.7v3l-2.3.7c-.2.6-.5 1.2-.9 1.8l1.1 2.2-2.1 2.1-2.2-1.1c-.6.4-1.2.7-1.8.9l-.7 2.3h-3l-.7-2.3a6.7 6.7 0 0 1-1.8-.9l-2.2 1.1-2.1-2.1 1.1-2.2a6.7 6.7 0 0 1-.9-1.8L3.5 13.5v-3l2.3-.7c.2-.6.5-1.2.9-1.8L5.6 5.8l2.1-2.1 2.2 1.1c.6-.4 1.2-.7 1.8-.9l.7-2.3Z" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="3.4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M9 7V5.8A1.8 1.8 0 0 1 10.8 4h6.4A1.8 1.8 0 0 1 19 5.8v12.4a1.8 1.8 0 0 1-1.8 1.8h-6.4A1.8 1.8 0 0 1 9 18.2V17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 12h-8" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m7.5 8.5 3.5 3.5-3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
 
 interface CoffeeAdminProps {
   /** The slug from the route (`/:coffeeSlug/admin`). */
@@ -65,6 +85,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
     (query: import("@/types/backend").AnalyticsQuery) => getCoffeeAnalytics(token ?? "", query),
     [token],
   );
+  const fetchShiftOptions = useCallback(() => listServiceShifts(token ?? "", undefined, 1, 50), [token]);
 
   const handleExpired = useCallback(() => {
     clearSession();
@@ -92,7 +113,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
   const [coffeeError, setCoffeeError] = useState<string | null>(null);
   const [wrongCoffee, setWrongCoffee] = useState(false);
 
-  const [view, setView] = useState<View>("orders");
+  const [view, setView] = useState<View>("service");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -447,7 +468,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
             type="button"
             className={cn(
               "admin-bar__link admin-settings-button",
-              (view === "profile" || view === "security") && "admin-settings-button--active",
+              (view === "menu" || view === "profile" || view === "security") && "admin-settings-button--active",
             )}
             aria-label={d.navigation.settings}
             title={d.navigation.settings}
@@ -455,11 +476,13 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
             aria-haspopup="menu"
             onClick={() => setSettingsOpen((open) => !open)}
           >
-            <span aria-hidden="true">⚙</span>
+            <span aria-hidden="true" className="admin-settings-button__icon">
+              <SettingsIcon />
+            </span>
           </button>
           {settingsOpen ? (
             <div className="admin-tabs__dropdown admin-header-settings__dropdown" role="menu">
-              {(["profile", "insights", "security"] as const).map((id) =>
+              {(["profile", "menu", "insights", "security"] as const).map((id) =>
                 id === "insights" ? (
                   <Link
                     key={id}
@@ -468,7 +491,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
                     role="menuitem"
                     onClick={() => setSettingsOpen(false)}
                   >
-                    {d.navigation.insights}
+                    <span className="admin-tabs__option__label">{d.navigation.insights}</span>
                   </Link>
                 ) : (
                 <button
@@ -483,10 +506,23 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
                     setItemForm(null);
                   }}
                 >
-                  {d.navigation[id]}
+                  <span className="admin-tabs__option__label">{d.navigation[id]}</span>
                 </button>
                 ),
               )}
+              <button
+                type="button"
+                role="menuitem"
+                className="admin-tabs__option admin-tabs__option--logout"
+                onClick={() => {
+                  setSettingsOpen(false);
+                  clearSession();
+                  setSession(null);
+                }}
+              >
+                <span className="admin-tabs__option__icon" aria-hidden="true"><LogoutIcon /></span>
+                <span className="admin-tabs__option__label">{d.chrome.logout}</span>
+              </button>
             </div>
           ) : null}
         </div>
@@ -503,11 +539,11 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
       ) : null}
 
       {initialView === "insights" ? (
-        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} backHref={`/menuscan/${coffeeSlug}/admin`} />
+        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} fetchShiftOptions={fetchShiftOptions} onSessionExpired={handleExpired} backHref={`/menuscan/${coffeeSlug}/admin`} />
       ) : null}
 
       {initialView !== "insights" ? <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>
-        {(["orders", "menu"] as const).map((id) => (
+        {(["service", "tables", "orders"] as const).map((id) => (
           <button
             key={id}
             type="button"
@@ -534,7 +570,9 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
           onAction={reloadCoffee}
         />
       ) : initialView !== "insights" && coffeeStatus === "ready" ? (
-        view === "menu" ? (
+        view === "service" || view === "tables" || view === "orders" ? (
+        <OrdersSection token={token} section={view} />
+      ) : view === "menu" ? (
         <>
           <section className="admin-section">
             <div className="admin-head">
@@ -664,8 +702,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
             </section>
           ) : null}
         </>
-      ) : view === "orders" ? (
-        <OrdersSection token={token} />
       ) : view === "profile" ? (
         coffee ? (
           <section className="admin-section">

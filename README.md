@@ -168,6 +168,30 @@ Historical category and promotion metrics are shown as unavailable because
 the backend order snapshot does not retain category or regular-price history.
 Current availability is not presented as historical availability.
 
+### Manual payment validation
+
+Coffee Admins manage order processing and payment separately. A confirmed
+order can remain `UNPAID` until staff verify payment at the café:
+
+```text
+PENDING -> CONFIRMED -> (manual validation) PAID
+PENDING -> REJECTED
+```
+
+`CONFIRMED` is not payment confirmation. The dashboard shows separate order
+and payment states, offers a confirmation dialog before marking an order paid,
+and disables payment validation for pending, rejected, or already paid orders.
+Payment is recorded through the token-scoped
+`PATCH /admin/my-coffee/orders/:orderId/payment` API; visitors cannot change
+payment status.
+
+Table views aggregate confirmed, paid, and outstanding amounts per table while
+keeping payment at individual order level. Service-shift summaries and
+Insights distinguish confirmed revenue, collected revenue, outstanding amount,
+and payment rate. Closing a shift with confirmed unpaid orders is allowed but
+shows a warning; historical order totals and item snapshots are never
+recalculated or overwritten.
+
 | Route | Implementation | Data/access |
 | --- | --- | --- |
 | `/` | `src/app/page.tsx` | Permanent redirect to `/menuscan` |
@@ -293,6 +317,111 @@ Items are not embedded in the category adapter; they are fetched on demand.
 When backend DTOs change, update `src/types/backend.ts`, the API function
 signatures, and the adapters together. Do not invent frontend-only copies of
 backend fields.
+
+## Table Session and Service Shift
+
+The public visitor flow is intentionally simple: a guest picks a table once,
+creates a table session, then keeps ordering against that active table session.
+The frontend does not expose backend concepts like `sessionId` or
+`serviceShiftId` to normal visitors; the UI speaks in human language such as
+"Table 12" and "Commande en cours".
+
+### Visitor flow
+
+```text
+First order
+  -> choose table number
+  -> submit order
+  -> backend creates/returns an active table session
+  -> store the session token in coffee-scoped browser storage
+  -> order confirmation
+
+Next orders in the same session
+  -> browse menu normally
+  -> add items to cart
+  -> submit another order
+  -> reuse the same active table session
+  -> no repeated form for the table number while the session stays active
+```
+
+The public ordering screen keeps `Ajouter à la commande` as a browsing action
+so guests can keep shopping without being forced into the cart flow. If a valid
+session is already active, the UI shows a compact, human-friendly table-state
+message instead of asking for the table again.
+
+### Session persistence and recovery
+
+The frontend stores the session token using `localStorage`, scoped by the
+coffee slug (`menuscan:table-session:<coffeeSlug>`). This prevents one coffee's
+active session from being reused on another coffee. The token is never exposed to
+normal visitors and no extra order history is persisted beyond the session token
+itself.
+
+The UI gracefully recovers from invalid, expired, or closed sessions. If the
+backend rejects the token, the visitor sees a short error state and can start a
+new table session without being stuck in an endless loader.
+
+### Order, Table Session, and Service Shift
+
+These are distinct but related concepts:
+
+- Order: one purchase record, with its own status and total.
+- Table Session: the table-level lifecycle that groups several orders for the same table in the current service period.
+- Service Shift: the staff operational period that groups active table sessions and helps the coffee team manage the current service window.
+
+The visitor-facing UX focuses on "table" and "order". The admin dashboard uses
+"service" and "tables actives" as the operational model, while preserving the
+individual order controls for confirm/reject/view details.
+
+### Coffee admin service flow
+
+The admin dashboard shows the current service at the top of the page and makes
+its state obvious with a current-shift indicator. Staff can open a morning or
+afternoon service, close the current service with confirmation, and review the
+shift history for recent service periods. The UI renders shift statistics,
+active tables, and order totals only from backend data; no static analytics or
+fixed totals are hardcoded.
+
+### Insights and shift filtering
+
+The Insights dashboard accepts a service filter and passes the backend's
+`serviceShiftId` query parameter through the typed API layer instead of filtering
+an "all orders" dataset in the browser. This keeps the analytics aligned with the
+backend's authoritative reporting model.
+
+### Routes and API contracts
+
+The frontend keeps the backend contract authoritative in `src/types/backend.ts`
+and `src/lib/api.ts`.
+
+```text
+Public order creation/reuse:
+  POST /api/v1/orders
+  GET /api/v1/orders/:id or related order queries
+  Table session token is reused if still active
+
+Admin service shift routes:
+  GET /api/v1/admin/service-shifts/current
+  POST /api/v1/admin/service-shifts/open
+  POST /api/v1/admin/service-shifts/close
+  GET /api/v1/admin/service-shifts
+
+Admin table-session routes:
+  GET /api/v1/admin/table-sessions
+  POST /api/v1/admin/table-sessions/:id/close
+```
+
+The frontend does not invent field names or response shapes. If the backend API
+changes, the frontend DTOs and endpoint wrappers are updated together.
+
+### Important UX decisions
+
+- Keep the visitor flow mobile-first and intuitive.
+- Preserve each individual order's status and identity.
+- Group orders by table session for staff without masking per-order actions.
+- Show pending and confirmed totals distinctly.
+- Avoid exposing technical backend names to visitors.
+- Recover gracefully on invalid, expired, closed, or cross-coffee session states.
 
 ## API integration
 
@@ -618,6 +747,95 @@ NEXT_PUBLIC_BACKEND_API_URL=https://your-deployed-api.example.com
 
 Do not add Cloudflare credentials to either frontend variable. R2
 configuration belongs exclusively in the backend environment.
+
+## Table Session visitor flow and Service Shift operations
+
+The frontend implements a human-language table flow instead of exposing the
+technical `TableSession` plumbing to regular visitors.
+
+### Visitor flow
+
+```text
+First order
+  -> user selects menu items
+  -> enters table number once
+  -> POST /api/v1/orders with the table number and items
+  -> backend creates or reuses an active table session
+  -> session token returned in the order response
+  -> frontend stores it under the coffee slug in localStorage
+  -> subsequent orders reuse the same table session automatically
+```
+
+The table number is only requested when there is no valid active session for
+that coffee. Once a token is stored for the coffee slug, the cart shows a
+friendly `Table X` / `Commande en cours` status instead of prompting again.
+This keeps the visitor feeling like they are ordering for a table, not for a
+technical backend object.
+
+### Session token persistence
+
+The browser stores only a minimal session token and table number under a
+coffee-scoped key such as `menuscan:table-session:<slug>`. The token is never
+shown to the visitor and never persisted beyond the browser storage available
+on that device. If the backend rejects the token, the session expires, the
+coffee changes, or the browser storage is unavailable, the UI clears the saved
+state and asks the visitor to begin a fresh table session.
+
+### Multiple orders and grouping
+
+The order creation API already supports table session reuse. Each new order
+keeps its own order identity and status while remaining part of that table's
+current experience. The frontend does not create separate unrelated purchase
+records in the UI; it groups orders by active table session when the admin
+screens render active tables.
+
+### Coffee admin: service shift and active tables
+
+The coffee-admin dashboard reads the real backend shift lifecycle:
+
+- `GET /api/v1/admin/my-coffee/service-shifts/current`
+- `POST /api/v1/admin/my-coffee/service-shifts/open`
+- `POST /api/v1/admin/my-coffee/service-shifts/close`
+- `GET /api/v1/admin/my-coffee/service-shifts`
+- `GET /api/v1/admin/my-coffee/table-sessions`
+- `PATCH /api/v1/admin/my-coffee/table-sessions/:sessionId/close`
+
+This creates a clear operational model:
+
+```text
+Current Service
+  -> Active tables
+      -> Individual orders
+```
+
+The admin screen exposes a simple open/close flow for the current service, a
+history list of previous shifts, and table cards that bundle the current active
+orders for each table session. Individual order status actions remain in place:
+confirm, reject, and view details still operate at the individual-order level.
+The table-session layer is a grouping and operational wrapper, not a replacement
+for current order management.
+
+### Insights and service filtering
+
+The insights dashboard accepts an optional `serviceShiftId` query value and the
+frontend passes it through the existing `AnalyticsQuery` contract. That allows
+shift-aware filtering in the same analytics API the dashboard already uses,
+without duplicating business logic in the browser. The coffee admin's insights
+screen therefore filters by a selected service when present and falls back to
+all services when no service is chosen.
+
+### Important UX decisions
+
+- The public visitor language remains human and French-first;
+- technical backend object names are never surfaced to guests;
+- the frontend treats the backend as the source of truth for shifts, sessions,
+  and statuses;
+- no static fake analytics or hard-coded table totals are used in the UI;
+- all session and shift states are recovered gracefully when the backend rejects
+  or closes them.
+
+This preserves the existing MENU SCAN visual design while adding the service
+shift and table-session lifecycle expected by the café workflow.
 
 ## Local development
 

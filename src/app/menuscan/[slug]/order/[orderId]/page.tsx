@@ -63,6 +63,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ slug: st
             })}
           </div>
           <div className="order-ticket__total"><span>{d.order.total}</span><strong>{order.total.toFixed(3)} DT</strong></div>
+          {order.status === "CONFIRMED" ? <p className="order-status__payment">{order.paymentStatus === "PAID" ? d.order.paymentPaid : d.order.paymentUnpaid}</p> : null}
         </div>
         <button
           className={`order-status__refresh${refreshing ? " order-status__refresh--loading" : ""}`}
