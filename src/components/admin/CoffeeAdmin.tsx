@@ -440,6 +440,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
       subtitle={d.chrome.roleCoffee}
       logo={coffee?.logo}
       publicMenuHref={`/menuscan/${coffeeSlug}`}
+      hideHeader={initialView === "insights"}
       headerActions={
         <div className="admin-header-settings">
           <button

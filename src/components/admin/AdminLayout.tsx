@@ -17,6 +17,8 @@ interface AdminLayoutProps {
   publicMenuHref?: string;
   /** Optional header controls rendered beside the public menu and logout actions. */
   headerActions?: React.ReactNode;
+  /** Hide the admin chrome on focused views such as insights. */
+  hideHeader?: boolean;
   onLogout: () => void;
   children: React.ReactNode;
 }
@@ -32,12 +34,13 @@ export function AdminLayout({
   logo,
   publicMenuHref,
   headerActions,
+  hideHeader = false,
   onLogout,
   children,
 }: AdminLayoutProps) {
   return (
     <div className="admin">
-      <header className="admin-bar">
+      {!hideHeader ? <header className="admin-bar">
         <div className="admin-bar__inner">
           <div className="admin-bar__brand">
             {logo ? (
@@ -66,7 +69,7 @@ export function AdminLayout({
             {headerActions}
           </div>
         </div>
-      </header>
+      </header> : null}
       <main id="main" className="admin-main">
         <div className="admin-container">{children}</div>
       </main>
