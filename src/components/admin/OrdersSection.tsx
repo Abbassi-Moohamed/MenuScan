@@ -111,7 +111,7 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
       ]);
       if (generation !== serviceRefreshSequence) return;
       setCurrentShift(shift);
-      setSessions(list.sessions);
+      setSessions(list.sessions.filter((session) => session.status === "ACTIVE"));
       setHistory(historyResult.shifts.filter((item) => item.id !== shift?.id));
     } catch {
       if (generation !== serviceRefreshSequence) return;
@@ -309,6 +309,9 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
       const canClose = await openTablePayment(sessionId);
       if (!canClose) return;
       await closeTableSession(token, sessionId);
+      setSessions((current) =>
+        current.filter((session) => session.id !== sessionId),
+      );
       await loadShiftData();
       if (returnToServiceClose && currentShift?.id) {
         const refreshed = await listTableSessions(token, {
@@ -370,6 +373,7 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
       { session: TableSessionDto; orders: OrderDto[] }
     >();
     for (const session of sessions) {
+      if (session.status !== "ACTIVE") continue;
       map.set(session.id, { session, orders: [] });
     }
     for (const order of orders) {
