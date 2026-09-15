@@ -2789,7 +2789,7 @@ img {
   gap: 0.5rem;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 2.5rem;
 }
 
 .category-row {
@@ -2880,6 +2880,18 @@ img {
   color: #9b1c37;
 }
 
+.row-action--availability {
+  min-width: 6.75rem;
+}
+
+.row-action--available {
+  color: #28734e;
+}
+
+.row-action--unavailable {
+  color: var(--color-amber-600);
+}
+
 @media (hover: hover) {
   .row-action:hover {
     border-color: var(--color-mocha-400);
@@ -2892,7 +2904,7 @@ img {
   gap: 0.5rem;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 2.5rem;
 }
 
 .item-row {
