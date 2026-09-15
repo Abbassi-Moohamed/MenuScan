@@ -250,6 +250,7 @@ export const fr: Dictionary = {
     insights: {
       title: "Analyses",
       hint: "Comprenez les performances du menu et identifiez les prochaines actions.",
+      back: "Retour",
       range: "Période",
       today: "Aujourd’hui",
       yesterday: "Hier",

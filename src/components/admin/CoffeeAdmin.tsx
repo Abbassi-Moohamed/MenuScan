@@ -502,7 +502,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
       ) : null}
 
       {initialView === "insights" ? (
-        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} />
+        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} backHref={`/menuscan/${coffeeSlug}/admin`} />
       ) : null}
 
       {initialView !== "insights" ? <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>

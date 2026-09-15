@@ -1964,6 +1964,10 @@ img {
   color: var(--color-mocha-500);
 }
 
+.insights-back {
+  flex: none;
+}
+
 .admin-section {
   display: flex;
   flex-direction: column;

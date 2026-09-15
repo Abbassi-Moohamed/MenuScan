@@ -1,11 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Dictionary } from "@/i18n/dictionary";
 import { actionError, isSessionFailure } from "@/lib/admin-errors";
 import type { AnalyticsDto, AnalyticsRange, AnalyticsQuery } from "@/types/backend";
 
-type Props = { dict: Dictionary; fetchAnalytics: (query: AnalyticsQuery) => Promise<AnalyticsDto>; onSessionExpired: () => void };
+type Props = {
+  dict: Dictionary;
+  fetchAnalytics: (query: AnalyticsQuery) => Promise<AnalyticsDto>;
+  onSessionExpired: () => void;
+  backHref: string;
+};
 const ranges: AnalyticsRange[] = ["today", "yesterday", "7d", "30d", "this-month", "previous-month", "custom"];
 const date = (value: Date) => value.toISOString().slice(0, 10);
 function queryFor(range: AnalyticsRange): AnalyticsQuery {
@@ -20,7 +26,7 @@ function queryFor(range: AnalyticsRange): AnalyticsQuery {
 const money = (n: number) => `${n.toFixed(2)} DT`;
 function change(metric: { changePercent: number | null; trend: string }) { return metric.changePercent === null ? "—" : `${metric.changePercent >= 0 ? "+" : ""}${metric.changePercent.toFixed(1)}%`; }
 
-export function InsightsDashboard({ dict, fetchAnalytics, onSessionExpired }: Props) {
+export function InsightsDashboard({ dict, fetchAnalytics, onSessionExpired, backHref }: Props) {
   const d = dict.admin.insights; const [range, setRange] = useState<AnalyticsRange>("7d"); const [from, setFrom] = useState(""); const [to, setTo] = useState("");
   const [data, setData] = useState<AnalyticsDto | null>(null); const [state, setState] = useState<"loading" | "ready" | "error">("loading"); const [error, setError] = useState("");
   const query = useMemo(() => range === "custom" ? { from: from || undefined, to: to || undefined } : queryFor(range), [range, from, to]);
@@ -28,7 +34,13 @@ export function InsightsDashboard({ dict, fetchAnalytics, onSessionExpired }: Pr
   useEffect(() => { if (range !== "custom") { const timer = window.setTimeout(() => void load(), 0); return () => window.clearTimeout(timer); } }, [load, range]);
   const labels: Record<AnalyticsRange, string> = { today: d.today, yesterday: d.yesterday, "7d": d.last7, "30d": d.last30, "this-month": d.thisMonth, "previous-month": d.previousMonth, custom: d.custom };
   return <section className="insights" aria-labelledby="insights-title">
-    <div className="admin-head"><div className="admin-head__text"><h1 id="insights-title" className="admin-head__title">{d.title}</h1><p className="admin-head__hint">{d.hint}</p></div></div>
+    <div className="admin-head">
+      <Link className="admin-btn admin-btn--ghost insights-back" href={backHref} aria-label={d.back}>
+        <span aria-hidden="true">←</span>
+        {d.back}
+      </Link>
+      <div className="admin-head__text"><h1 id="insights-title" className="admin-head__title">{d.title}</h1><p className="admin-head__hint">{d.hint}</p></div>
+    </div>
     <div className="insights-filters"><label className="admin-field"><span className="admin-field__label">{d.range}</span><select className="admin-field__input" value={range} onChange={(e) => setRange(e.target.value as AnalyticsRange)}>{ranges.map((r) => <option key={r} value={r}>{labels[r]}</option>)}</select></label>{range === "custom" ? <><label className="admin-field"><span className="admin-field__label">{d.from}</span><input className="admin-field__input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></label><label className="admin-field"><span className="admin-field__label">{d.to}</span><input className="admin-field__input" type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label><button className="admin-btn admin-btn--primary" type="button" disabled={!from || !to} onClick={() => void load()}>{d.apply}</button></> : null}</div>
     {state === "loading" ? <div className="insights-skeleton" aria-busy="true"><span /><span /><span /><span /></div> : null}
     {state === "error" ? <div className="admin-notice"><h2 className="admin-notice__title">{d.errorTitle}</h2><p className="admin-notice__text">{error}</p><button className="admin-notice__action" type="button" onClick={() => void load()}>{d.retry}</button></div> : null}

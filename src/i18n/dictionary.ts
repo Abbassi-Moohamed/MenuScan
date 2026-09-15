@@ -242,6 +242,7 @@ export interface Dictionary {
     insights: {
       title: string;
       hint: string;
+      back: string;
       range: string;
       today: string;
       yesterday: string;

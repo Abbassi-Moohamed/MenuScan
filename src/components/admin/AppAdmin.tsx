@@ -249,7 +249,7 @@ export function AppAdmin({ initialView = "coffees" }: { initialView?: "coffees" 
       }}
     >
       {initialView === "insights" ? (
-        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} />
+        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} backHref="/menuscan/admin" />
       ) : null}
       {initialView !== "insights" && notice ? (
         <p className="admin-toast" role="status">
