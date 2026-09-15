@@ -83,6 +83,14 @@ export function CategoryList({
               onClick={() => onSelect(category)}
               aria-label={`${category.name} — ${d.categories.itemCount(count ?? 0)}`}
             >
+              {category.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="category-row__image" src={category.image} alt="" />
+              ) : (
+                <span className="category-row__image category-row__image--empty" aria-hidden="true">
+                  {category.name.charAt(0).toUpperCase()}
+                </span>
+              )}
               <span className="category-row__name">{category.name}</span>
               <span className="category-row__count">
                 {count === undefined ? "·" : d.categories.itemCount(count)}

@@ -2815,6 +2815,26 @@ img {
   text-align: left;
 }
 
+.category-row__image,
+.item-row__image {
+  flex: none;
+  width: 3.25rem;
+  height: 3.25rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--color-cream-100);
+}
+
+.category-row__image--empty,
+.item-row__image--empty {
+  display: grid;
+  place-items: center;
+  color: var(--color-mocha-500);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
 .category-row__main--active {
   background: var(--color-amber-100);
 }

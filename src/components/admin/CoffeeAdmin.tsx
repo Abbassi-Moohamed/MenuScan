@@ -536,7 +536,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
         </p>
       ) : null}
 
-      {initialView !== "insights" && isSettingsView ? (
+      {initialView !== "insights" && isSettingsView && !categoryForm && !itemForm && !activeCategoryId ? (
         <button
           type="button"
           className="admin-btn admin-btn--ghost admin-settings-back"

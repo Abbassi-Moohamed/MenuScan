@@ -57,6 +57,14 @@ export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelet
     <ul className="item-list">
       {items.map((item) => (
         <li key={item.id} className="item-row">
+          {item.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="item-row__image" src={item.image} alt="" />
+          ) : (
+            <span className="item-row__image item-row__image--empty" aria-hidden="true">
+              {item.name.charAt(0).toUpperCase()}
+            </span>
+          )}
           <span className="item-row__body">
             <span className="item-row__name">{item.name}</span>
             <span className="item-row__price">
