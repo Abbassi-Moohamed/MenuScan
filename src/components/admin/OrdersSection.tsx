@@ -47,6 +47,8 @@ type OpenServiceTable = {
   revenue: number;
 };
 
+let serviceRefreshSequence = 0;
+
 export function OrdersSection({ token, section }: OrdersSectionProps) {
   const dict = getDictionary();
   const d = dict.admin.orders;
@@ -84,7 +86,6 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
     OpenServiceTable[] | null
   >(null);
   const [returnToServiceClose, setReturnToServiceClose] = useState(false);
-
   const loadOrders = useCallback(() => {
     const status = section === "orders" ? filter : undefined;
     const paymentStatus =
@@ -97,6 +98,7 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
   }, [token, filter, paymentFilter, section]);
 
   const loadShiftData = useCallback(async () => {
+    const generation = ++serviceRefreshSequence;
     try {
       const [shift, list, historyResult] = await Promise.all([
         getCurrentServiceShift(token),
@@ -105,10 +107,12 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
           ? listServiceShifts(token, "CLOSED", 1, historyRange === "all" ? 50 : 50)
           : Promise.resolve({ shifts: [], total: 0, page: 1, limit: 50 }),
       ]);
+      if (generation !== serviceRefreshSequence) return;
       setCurrentShift(shift);
       setSessions(list.sessions);
       setHistory(historyResult.shifts.filter((item) => item.id !== shift?.id));
     } catch {
+      if (generation !== serviceRefreshSequence) return;
       setCurrentShift(null);
       setSessions([]);
       setHistory([]);
@@ -128,7 +132,7 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
   const action = async (id: string, status: OrderStatus) => {
     await updateOrderStatus(token, id, status);
     loadOrders();
-    void loadShiftData();
+    await loadShiftData();
   };
 
   const handleOpenShift = async () => {
@@ -211,7 +215,7 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
           orders: refreshed.summary?.orders ?? [],
         });
       }
-      void loadShiftData();
+      await loadShiftData();
     } catch (e) {
       setError(
         e instanceof Error
