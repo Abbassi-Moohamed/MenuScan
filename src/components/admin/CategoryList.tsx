@@ -92,18 +92,18 @@ export function CategoryList({
               <span className="category-row__count">{d.categories.itemCount(count)}</span>
             </button>
             <div className="category-row__actions">
-              <button type="button" className="row-action" onClick={() => onSelect(category)}>
-                {d.categories.viewItems}
-              </button>
-              <button type="button" className="row-action" onClick={() => onEdit(category)}>
-                {d.categories.edit}
-              </button>
               <button
                 type="button"
                 className="row-action row-action--danger"
                 onClick={() => onDelete(category)}
               >
                 {d.delete.confirm}
+              </button>
+              <button type="button" className="row-action" onClick={() => onEdit(category)}>
+                {d.categories.edit}
+              </button>
+              <button type="button" className="row-action" onClick={() => onSelect(category)}>
+                {d.categories.viewItems}
               </button>
             </div>
           </li>
