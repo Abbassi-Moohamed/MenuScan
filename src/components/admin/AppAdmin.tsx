@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { getDictionary } from "@/i18n";
 import {
@@ -19,6 +20,7 @@ import {
   listCoffees,
   loginAppAdmin,
   resetCoffeePin,
+  getAppAnalytics,
   updateCoffee,
   uploadImage,
 } from "@/lib/api";
@@ -29,6 +31,7 @@ import { AdminLayout } from "./AdminLayout";
 import { AdminPinGate } from "./AdminPinGate";
 import { CoffeeForm, type CoffeeFormValues } from "./CoffeeForm";
 import { CoffeeList } from "./CoffeeList";
+import { InsightsDashboard } from "./InsightsDashboard";
 
 type FormState = { mode: "create" } | { mode: "edit"; coffee: AdminCoffeeDto } | null;
 
@@ -37,13 +40,17 @@ type FormState = { mode: "create" } | { mode: "edit"; coffee: AdminCoffeeDto } |
  * PIN gate; the app admin can create, edit, delete and reset the PIN of any
  * coffee.
  */
-export function AppAdmin() {
+export function AppAdmin({ initialView = "coffees" }: { initialView?: "coffees" | "insights" }) {
   const dict = getDictionary();
   const d = dict.admin;
 
   const [session, setSession] = useState<AdminSession | null>(null);
   const authed = session !== null;
   const token = session?.token ?? null;
+  const fetchAnalytics = useCallback(
+    (query: import("@/types/backend").AnalyticsQuery) => getAppAnalytics(token ?? "", query),
+    [token],
+  );
 
   const handleExpired = useCallback(() => {
     clearSession();
@@ -231,18 +238,26 @@ export function AppAdmin() {
       dict={dict}
       title={d.chrome.appTitle}
       subtitle={d.chrome.roleApp}
+      headerActions={
+        <Link className="admin-bar__link" href="/menuscan/admin/insights">
+          {d.navigation.insights}
+        </Link>
+      }
       onLogout={() => {
         clearSession();
         setSession(null);
       }}
     >
-      {notice ? (
+      {initialView === "insights" ? (
+        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} />
+      ) : null}
+      {initialView !== "insights" && notice ? (
         <p className="admin-toast" role="status">
           {notice}
         </p>
       ) : null}
 
-      <div className="admin-head">
+      {initialView !== "insights" ? <div className="admin-head">
         <div className="admin-head__text">
           <h1 className="admin-head__title">{d.app.coffeesTitle}</h1>
           <p className="admin-head__hint">{d.app.coffeesHint}</p>
@@ -257,9 +272,9 @@ export function AppAdmin() {
         >
           {d.app.createCoffee}
         </button>
-      </div>
+      </div> : null}
 
-      {form ? (
+      {initialView !== "insights" && form ? (
         <CoffeeForm
           dict={dict}
           mode={form.mode}
@@ -276,7 +291,7 @@ export function AppAdmin() {
         />
       ) : null}
 
-      <CoffeeList
+      {initialView !== "insights" ? <CoffeeList
         dict={dict}
         coffees={coffees ?? []}
         loading={listStatus === "idle"}
@@ -288,9 +303,9 @@ export function AppAdmin() {
         }}
         onResetPin={(coffee) => setResetTarget(coffee)}
         onDelete={(coffee) => setDeleteTarget(coffee)}
-      />
+      /> : null}
 
-      {deleteTarget ? (
+      {initialView !== "insights" && deleteTarget ? (
         <AdminConfirmDialog
           title={d.delete.coffeeTitle(deleteTarget.name)}
           message={d.delete.coffeeMessage}
@@ -303,7 +318,7 @@ export function AppAdmin() {
         />
       ) : null}
 
-      {resetTarget ? (
+      {initialView !== "insights" && resetTarget ? (
         <AdminConfirmDialog
           title={d.app.resetPinDialogTitle}
           message={d.app.resetPinDialogText}

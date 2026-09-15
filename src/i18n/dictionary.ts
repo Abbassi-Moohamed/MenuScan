@@ -1,15 +1,11 @@
 export interface Dictionary {
   order: {
-    addToCart: string; openCart: string; closeCart: string; cartTitle: string; emptyCart: string;
+    addToCart: string; openCart: string; closeCart: string; cartTitle: string;
     decrease: string; increase: string; total: string; tableNumber: string; tablePlaceholder: string; addedToCart: string; viewOrder: string;
-    submit: string; submitting: string; invalidCheckout: string; submitError: string; statusLink: string;
+    submit: string; submitting: string; invalidCheckout: string; submitError: string;
     confirmationTitle: string; confirmationMessage: string; status: string; statusPending: string;
     statusConfirmed: string; statusRejected: string; statusReady: string; statusCompleted: string;
     refresh: string; orderNotFound: string;
-  };
-  header: {
-    status: string;
-    statusTitle: string;
   };
   landing: {
     eyebrow: string;
@@ -195,6 +191,7 @@ export interface Dictionary {
     navigation: {
       menu: string;
       orders: string;
+      insights: string;
       settings: string;
       profile: string;
       security: string;
@@ -241,6 +238,45 @@ export interface Dictionary {
       retry: string;
       wrongCoffee: string;
       wrongCoffeeMessage: string;
+    };
+    insights: {
+      title: string;
+      hint: string;
+      range: string;
+      today: string;
+      yesterday: string;
+      last7: string;
+      last30: string;
+      thisMonth: string;
+      previousMonth: string;
+      custom: string;
+      from: string;
+      to: string;
+      apply: string;
+      loading: string;
+      emptyTitle: string;
+      emptyMessage: string;
+      errorTitle: string;
+      retry: string;
+      views: string;
+      orders: string;
+      confirmedOrders: string;
+      itemsSold: string;
+      revenue: string;
+      averageOrder: string;
+      trend: string;
+      topItems: string;
+      topCategories: string;
+      peakHours: string;
+      statuses: string;
+      promotions: string;
+      availability: string;
+      available: string;
+      unavailable: string;
+      actionable: string;
+      noData: string;
+      currency: string;
+      percent: string;
     };
   };
 }

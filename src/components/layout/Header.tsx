@@ -1,11 +1,41 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+
 import { siteConfig } from "@/config/site";
-import type { Dictionary } from "@/i18n/dictionary";
+import { cartEventName } from "@/lib/cart";
 
 interface HeaderProps {
-  dict: Dictionary;
+  viewOrder: string;
 }
 
-export function Header({ dict }: HeaderProps) {
+export function Header({ viewOrder }: HeaderProps) {
+  const pathname = usePathname();
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const pathParts = pathname.split("/").filter(Boolean);
+  const isAdminPage = pathParts.includes("admin");
+  const coffeeSlug =
+    pathParts[0] === "menuscan" && pathParts.length >= 2 && !isAdminPage
+      ? pathParts[1]
+      : null;
+
+  useEffect(() => {
+    if (!coffeeSlug) return;
+
+    const syncOrder = () => {
+      setActiveOrderId(window.localStorage.getItem(`menuscan:active-order:${coffeeSlug}`));
+    };
+    syncOrder();
+    window.addEventListener(cartEventName(), syncOrder);
+    window.addEventListener("storage", syncOrder);
+    return () => {
+      window.removeEventListener(cartEventName(), syncOrder);
+      window.removeEventListener("storage", syncOrder);
+    };
+  }, [coffeeSlug]);
+
   return (
     <header className="site-header">
       <div className="container site-header__inner">
@@ -15,10 +45,15 @@ export function Header({ dict }: HeaderProps) {
           </span>
         </a>
         <span className="site-header__spacer" aria-hidden="true" />
-        <span className="status-chip" title={dict.header.statusTitle}>
-          <span className="status-chip__dot" aria-hidden="true" />
-          {dict.header.status}
-        </span>
+        {activeOrderId && coffeeSlug ? (
+          <Link
+            className="header-order-link"
+            href={`/menuscan/${coffeeSlug}/order/${activeOrderId}`}
+          >
+            <span className="header-order-link__icon" aria-hidden="true">📋</span>
+            {viewOrder}
+          </Link>
+        ) : null}
       </div>
     </header>
   );

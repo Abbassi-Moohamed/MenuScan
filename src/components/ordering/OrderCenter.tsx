@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -98,11 +97,6 @@ export function OrderCenter({ coffeeSlug, items = [] }: OrderCenterProps) {
             <span aria-hidden="true">🛒</span><span>{cartCount(lines)}</span>
           </button>
         ) : null}
-        {activeOrderId ? (
-          <Link className="order-status-fab" href={`/menuscan/${coffeeSlug}/order/${activeOrderId}`} aria-label={d.order.viewOrder}>
-            <span aria-hidden="true">📋</span><span>{d.order.viewOrder}</span>
-          </Link>
-        ) : null}
       </div>
 
       {open ? (
@@ -134,7 +128,6 @@ export function OrderCenter({ coffeeSlug, items = [] }: OrderCenterProps) {
             <label className="admin-field"><span className="admin-field__label">{d.order.tableNumber}</span><input className="admin-field__input" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} inputMode="numeric" placeholder={d.order.tablePlaceholder} /></label>
             {error ? <p className="admin-form__error">{error}</p> : null}
             <button className="admin-btn admin-btn--primary" type="button" disabled={busy || lines.length === 0} onClick={() => void submit()}>{busy ? d.order.submitting : d.order.submit}</button>
-            {activeOrderId ? <Link className="admin-btn admin-btn--ghost" href={`/menuscan/${coffeeSlug}/order/${activeOrderId}`}>{d.order.viewOrder}</Link> : null}
           </section>
         </div>
       ) : null}

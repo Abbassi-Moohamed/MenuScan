@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { getDictionary } from "@/i18n";
 import { actionError, isSessionFailure } from "@/lib/admin-errors";
@@ -19,6 +20,7 @@ import {
   updateMyItem,
   updateMyCoffee,
   uploadImage,
+  getCoffeeAnalytics,
 } from "@/lib/api";
 import type { AdminCategoryDto, AdminCoffeeDto, AdminItemDto } from "@/types/backend";
 import { cn } from "@/lib/utils";
@@ -34,6 +36,7 @@ import { CoffeeForm, type CoffeeFormValues } from "./CoffeeForm";
 import { ItemForm, type ItemFormValues } from "./ItemForm";
 import { ItemList } from "./ItemList";
 import { OrdersSection } from "./OrdersSection";
+import { InsightsDashboard } from "./InsightsDashboard";
 
 type AsyncStatus = "idle" | "loading" | "ready" | "error";
 type View = "menu" | "orders" | "profile" | "security";
@@ -43,6 +46,7 @@ type ItemFormState = { mode: "create" } | { mode: "edit"; item: AdminItemDto } |
 interface CoffeeAdminProps {
   /** The slug from the route (`/:coffeeSlug/admin`). */
   coffeeSlug: string;
+  initialView?: "menu" | "insights";
 }
 
 /**
@@ -50,13 +54,17 @@ interface CoffeeAdminProps {
  * the session token, never to anything the frontend sends — the route slug is
  * only cross-checked against the authenticated coffee.
  */
-export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
+export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminProps) {
   const dict = getDictionary();
   const d = dict.admin;
 
   const [session, setSession] = useState<AdminSession | null>(null);
   const authed = session !== null;
   const token = session?.token ?? null;
+  const fetchAnalytics = useCallback(
+    (query: import("@/types/backend").AnalyticsQuery) => getCoffeeAnalytics(token ?? "", query),
+    [token],
+  );
 
   const handleExpired = useCallback(() => {
     clearSession();
@@ -450,7 +458,18 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
           </button>
           {settingsOpen ? (
             <div className="admin-tabs__dropdown admin-header-settings__dropdown" role="menu">
-              {(["profile", "security"] as const).map((id) => (
+              {(["profile", "insights", "security"] as const).map((id) =>
+                id === "insights" ? (
+                  <Link
+                    key={id}
+                    className="admin-tabs__option"
+                    href={`/menuscan/${coffeeSlug}/admin/insights`}
+                    role="menuitem"
+                    onClick={() => setSettingsOpen(false)}
+                  >
+                    {d.navigation.insights}
+                  </Link>
+                ) : (
                 <button
                   key={id}
                   type="button"
@@ -465,7 +484,8 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
                 >
                   {d.navigation[id]}
                 </button>
-              ))}
+                ),
+              )}
             </div>
           ) : null}
         </div>
@@ -481,7 +501,11 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
         </p>
       ) : null}
 
-      <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>
+      {initialView === "insights" ? (
+        <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} onSessionExpired={handleExpired} />
+      ) : null}
+
+      {initialView !== "insights" ? <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>
         {(["orders", "menu"] as const).map((id) => (
           <button
             key={id}
@@ -499,16 +523,16 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
             {d.navigation[id]}
           </button>
         ))}
-      </nav>
+      </nav> : null}
 
-      {coffeeStatus === "error" ? (
+      {initialView !== "insights" && coffeeStatus === "error" ? (
         <AdminNotice
           title={d.errors.loadFailed}
           message={coffeeError ?? undefined}
           actionLabel={d.errors.retry}
           onAction={reloadCoffee}
         />
-      ) : coffeeStatus === "ready" ? (
+      ) : initialView !== "insights" && coffeeStatus === "ready" ? (
         view === "menu" ? (
         <>
           <section className="admin-section">
@@ -677,11 +701,11 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
             onSubmit={handlePinChange}
           />
         </section>
-      )) : (
+      )      ) : initialView !== "insights" ? (
         <AdminNotice title={d.errors.loadFailed} loading />
-      )}
+      ) : null}
 
-      {categoryDelete ? (
+      {initialView !== "insights" && categoryDelete ? (
         <AdminConfirmDialog
           title={d.delete.categoryTitle(categoryDelete.name)}
           message={d.delete.categoryMessage}
@@ -694,7 +718,7 @@ export function CoffeeAdmin({ coffeeSlug }: CoffeeAdminProps) {
         />
       ) : null}
 
-      {itemDelete ? (
+      {initialView !== "insights" && itemDelete ? (
         <AdminConfirmDialog
           title={d.delete.itemTitle(itemDelete.name)}
           message={d.delete.itemMessage}

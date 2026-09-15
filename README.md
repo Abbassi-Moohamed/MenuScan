@@ -49,6 +49,12 @@ Application admin
    |
    v
 Coffee admin
+
+/menuscan/admin/insights
+/menuscan/:slug/admin/insights
+   |
+   v
+Analytics dashboard
 ```
 
 Application administrators manage every coffee. A coffee administrator manages
@@ -86,57 +92,57 @@ validation package.
 
 ```text
 frontend/
-├── public/
-│   ├── icon.svg
-│   ├── icon-192.png
-│   ├── icon-512.png
-│   └── manifest.webmanifest
-├── src/
-│   ├── app/
-│   │   ├── page.tsx                         # Redirects / -> /menuscan
-│   │   ├── layout.tsx                       # Root layout, fonts, metadata, public chrome
-│   │   ├── globals.css                      # Shared public and admin design system
-│   │   ├── error.tsx                        # Branded runtime error boundary
-│   │   ├── not-found.tsx                    # Branded global 404
-│   │   ├── [coffeeSlug]/page.tsx            # Legacy public coffee redirect
-│   │   ├── [coffeeSlug]/admin/page.tsx      # Legacy coffee-admin redirect
-│   │   └── menuscan/
-│   │       ├── page.tsx                     # Canonical brand landing page
-│   │       ├── admin/page.tsx               # Application-admin route
-│   │       └── [slug]/
-│   │           ├── page.tsx                 # Public coffee menu
-│   │           ├── admin/page.tsx           # Coffee-admin route
-│   │           └── [categName]/
-│   │               ├── page.tsx             # Public category items page
-│   │               └── not-found.tsx       # Category-specific 404
-│   ├── components/
-│   │   ├── admin/                           # PIN gate, CRUD forms/lists, admin shell
-│   │   ├── layout/                          # Header, footer, public chrome, back-to-top
-│   │   └── menu/                            # Brand intro, bubbles, item cards and art
-│   ├── config/
-│   │   ├── api.ts                            # Context-aware API base URL
-│   │   └── site.ts                           # Brand, locale, currency and public URL
-│   ├── i18n/
-│   │   ├── dictionary.ts                     # Dictionary TypeScript contract
-│   │   ├── fr.ts                             # French UI copy
-│   │   └── index.ts                          # Dictionary access
-│   ├── lib/
-│   │   ├── api.ts                            # Public and admin API functions
-│   │   ├── adapters.ts                       # Backend DTO -> presentation model
-│   │   ├── admin-errors.ts                   # Status -> user-facing admin errors
-│   │   ├── admin-session.ts                   # sessionStorage token lifecycle
-│   │   ├── blob.ts                            # Deterministic bubble geometry/layout
-│   │   ├── menu.ts                            # Currency/price formatting
-│   │   ├── public-coffee.ts                  # Public coffee resolution and 404 mapping
-│   │   ├── utils.ts                           # Slugs and class-name helpers
-│   │   └── validators.ts                     # URL and price validation
-│   └── types/
-│       ├── backend.ts                        # API envelopes and backend DTOs
-│       └── menu.ts                           # UI presentation types
-├── .env.example
-├── next.config.ts
-├── package.json
-└── tsconfig.json
+â”œâ”€â”€ public/
+â”‚   â”œâ”€â”€ icon.svg
+â”‚   â”œâ”€â”€ icon-192.png
+â”‚   â”œâ”€â”€ icon-512.png
+â”‚   â””â”€â”€ manifest.webmanifest
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ app/
+â”‚   â”‚   â”œâ”€â”€ page.tsx                         # Redirects / -> /menuscan
+â”‚   â”‚   â”œâ”€â”€ layout.tsx                       # Root layout, fonts, metadata, public chrome
+â”‚   â”‚   â”œâ”€â”€ globals.css                      # Shared public and admin design system
+â”‚   â”‚   â”œâ”€â”€ error.tsx                        # Branded runtime error boundary
+â”‚   â”‚   â”œâ”€â”€ not-found.tsx                    # Branded global 404
+â”‚   â”‚   â”œâ”€â”€ [coffeeSlug]/page.tsx            # Legacy public coffee redirect
+â”‚   â”‚   â”œâ”€â”€ [coffeeSlug]/admin/page.tsx      # Legacy coffee-admin redirect
+â”‚   â”‚   â””â”€â”€ menuscan/
+â”‚   â”‚       â”œâ”€â”€ page.tsx                     # Canonical brand landing page
+â”‚   â”‚       â”œâ”€â”€ admin/page.tsx               # Application-admin route
+â”‚   â”‚       â””â”€â”€ [slug]/
+â”‚   â”‚           â”œâ”€â”€ page.tsx                 # Public coffee menu
+â”‚   â”‚           â”œâ”€â”€ admin/page.tsx           # Coffee-admin route
+â”‚   â”‚           â””â”€â”€ [categName]/
+â”‚   â”‚               â”œâ”€â”€ page.tsx             # Public category items page
+â”‚   â”‚               â””â”€â”€ not-found.tsx       # Category-specific 404
+â”‚   â”œâ”€â”€ components/
+â”‚   â”‚   â”œâ”€â”€ admin/                           # PIN gate, CRUD forms/lists, admin shell
+â”‚   â”‚   â”œâ”€â”€ layout/                          # Header, footer, public chrome, back-to-top
+â”‚   â”‚   â””â”€â”€ menu/                            # Brand intro, bubbles, item cards and art
+â”‚   â”œâ”€â”€ config/
+â”‚   â”‚   â”œâ”€â”€ api.ts                            # Context-aware API base URL
+â”‚   â”‚   â””â”€â”€ site.ts                           # Brand, locale, currency and public URL
+â”‚   â”œâ”€â”€ i18n/
+â”‚   â”‚   â”œâ”€â”€ dictionary.ts                     # Dictionary TypeScript contract
+â”‚   â”‚   â”œâ”€â”€ fr.ts                             # French UI copy
+â”‚   â”‚   â””â”€â”€ index.ts                          # Dictionary access
+â”‚   â”œâ”€â”€ lib/
+â”‚   â”‚   â”œâ”€â”€ api.ts                            # Public and admin API functions
+â”‚   â”‚   â”œâ”€â”€ adapters.ts                       # Backend DTO -> presentation model
+â”‚   â”‚   â”œâ”€â”€ admin-errors.ts                   # Status -> user-facing admin errors
+â”‚   â”‚   â”œâ”€â”€ admin-session.ts                   # sessionStorage token lifecycle
+â”‚   â”‚   â”œâ”€â”€ blob.ts                            # Deterministic bubble geometry/layout
+â”‚   â”‚   â”œâ”€â”€ menu.ts                            # Currency/price formatting
+â”‚   â”‚   â”œâ”€â”€ public-coffee.ts                  # Public coffee resolution and 404 mapping
+â”‚   â”‚   â”œâ”€â”€ utils.ts                           # Slugs and class-name helpers
+â”‚   â”‚   â””â”€â”€ validators.ts                     # URL and price validation
+â”‚   â””â”€â”€ types/
+â”‚       â”œâ”€â”€ backend.ts                        # API envelopes and backend DTOs
+â”‚       â””â”€â”€ menu.ts                           # UI presentation types
+â”œâ”€â”€ .env.example
+â”œâ”€â”€ next.config.ts
+â”œâ”€â”€ package.json
+â””â”€â”€ tsconfig.json
 ```
 
 `src/app` owns route composition and server-side data loading. `src/components`
@@ -147,6 +153,21 @@ fields belong in `src/types/menu.ts` and `src/lib/adapters.ts`.
 
 ## Routing architecture
 
+The authenticated Insights pages are `/menuscan/:slug/admin/insights` for
+coffee administrators and `/menuscan/admin/insights` for the application
+administrator. `InsightsDashboard` sends one typed request through
+`src/lib/api.ts` for each selected range and renders the compact
+`AnalyticsDto`; it never downloads orders or calculates business metrics in
+the browser. The dashboard includes UTC date filters, KPI comparisons,
+revenue/order trends, top items, peak hours, statuses, current availability,
+and deterministic actionable messages. Loading skeletons, French empty/error
+states, retry behavior, and responsive card/bar layouts are provided by the
+existing admin styles. Custom ranges are limited by the backend to 366 days.
+
+Historical category and promotion metrics are shown as unavailable because
+the backend order snapshot does not retain category or regular-price history.
+Current availability is not presented as historical availability.
+
 | Route | Implementation | Data/access |
 | --- | --- | --- |
 | `/` | `src/app/page.tsx` | Permanent redirect to `/menuscan` |
@@ -155,7 +176,9 @@ fields belong in `src/types/menu.ts` and `src/lib/adapters.ts`.
 | `/menuscan/:slug` | `src/app/menuscan/[slug]/page.tsx` | Server-fetches a coffee and its category summaries by slug |
 | `/menuscan/:slug/:categName` | `src/app/menuscan/[slug]/[categName]/page.tsx` | Resolves category within that coffee, then fetches category items |
 | `/menuscan/admin` | `src/app/menuscan/admin/page.tsx` | Client-driven application-admin PIN gate and console |
+| `/menuscan/admin/insights` | `src/app/menuscan/admin/insights/page.tsx` | Authenticated application analytics dashboard |
 | `/menuscan/:slug/admin` | `src/app/menuscan/[slug]/admin/page.tsx` | Client-driven coffee-admin PIN gate and console |
+| `/menuscan/:slug/admin/insights` | `src/app/menuscan/[slug]/admin/insights/page.tsx` | Authenticated coffee analytics dashboard |
 | `/:coffeeSlug/admin` | `src/app/[coffeeSlug]/admin/page.tsx` | Permanent redirect to canonical coffee-admin route |
 
 The category URL uses `slugify(category.name)`. It is not a backend category
@@ -211,6 +234,17 @@ flowchart TD
     Coffee -. categories summary .-> Category
     Category -. item query by categoryId .-> Item
 ```
+
+### Analytics
+
+Both admin levels use the same typed analytics contract. The application
+dashboard calls `GET /api/v1/admin/insights`; a coffee dashboard calls
+`GET /api/v1/admin/my-coffee/insights`. Both accept optional `from` and `to`
+ISO date query parameters and return `AnalyticsDto` (KPIs, trend, rankings,
+peak hours, order statuses, promotions, availability, and actionable
+insights).
+The dashboard supports today, yesterday, 7/30 days, this month, previous
+month, and custom ranges without adding a chart dependency.
 
 ### Backend/API DTOs
 
@@ -295,7 +329,7 @@ with the HTTP status attached.
 
 ### Application-admin endpoints
 
-All endpoints below require `Authorization: Bearer <token>`.
+All endpoints below require an `Authorization: Bearer <token>` header.
 
 | Method | Endpoint | Operation |
 | --- | --- | --- |
@@ -369,7 +403,7 @@ to a gradient block with the item's initial.
 Cards use a single-column sheet on the mobile-first layout and a constrained
 larger presentation at wider widths. Category pages show the item count in
 their header. A category with zero items renders the translated
-“nothing in this category” state instead of an empty list.
+â€œnothing in this categoryâ€ state instead of an empty list.
 
 ## Backoffice architecture
 
@@ -518,13 +552,13 @@ request has been cancelled.
 | Coffee not found or invalid slug | Branded public 404 |
 | Category not found for the coffee | Category-specific 404 |
 | Backend failure loading a public page | Branded unavailable page with retry |
-| Empty coffee categories | “This coffee has not published its menu” state |
-| Empty category items | “Nothing in this category” state |
+| Empty coffee categories | â€œThis coffee has not published its menuâ€ state |
+| Empty category items | â€œNothing in this categoryâ€ state |
 | Invalid PIN | Friendly translated PIN error; input is cleared |
 | Admin `401` | Session cleared; user returns to PIN gate |
 | Admin `403` | Session cleared for re-authentication, or translated forbidden action error |
 | Admin `404`/`409`/`400` | Translated not-found, conflict, or validation message |
-| Network failure | Translated “cannot reach server” message |
+| Network failure | Translated â€œcannot reach serverâ€ message |
 
 Raw backend error text is not rendered as customer-facing copy. The mapping
 in `src/lib/admin-errors.ts` translates status codes by context.
@@ -789,4 +823,194 @@ DELETE /api/v1/admin/my-coffee/items/:itemId
 
 ## License
 
-Private — © MenuScan.
+Private â€” Â© MenuScan.
+
+## Cart and order architecture
+
+The cart is implemented in `src/lib/cart.ts` and rendered by
+`src/components/ordering/OrderCenter.tsx`. `OrderExperience.tsx` owns the
+category-page add action and renders `OrderCenter` with the currently loaded
+items.
+
+```text
+Cart = local, not submitted
+Order = backend record, already submitted
+```
+
+- A cart is stored in `localStorage` under `menuscan:cart:<coffeeSlug>`.
+- Each coffee has an isolated cart; switching coffee slugs never reuses the
+  previous coffee's lines.
+- Cart lines store the item identity, display snapshot (name/price/promotion/
+  image), and quantity. `cartTotal`, `cartCount`, and `cartLinePrice` derive
+  display values from those lines.
+- Adding an item increments its quantity. The minus control decrements and
+  removes the line at zero. The plus control is disabled when the item is
+  known to be unavailable.
+- `menuscan-cart-change` is a browser `CustomEvent` used to synchronize the
+  floating cart and category add controls in the same tab.
+- The cart is cleared only after `POST /orders` succeeds. The returned order ID
+  is stored as `menuscan:active-order:<coffeeSlug>` so the visitor can reopen
+  the submitted order from the menu.
+- Availability is evaluated only when the current page has authoritative item
+  data. This prevents an item from another category, still present in the
+  shared cart, being falsely labelled `Indisponible`. The backend remains the
+  final validator at submission time.
+
+## Order lifecycle and visitor UI
+
+`OrderStatus` is the union `PENDING | CONFIRMED | REJECTED`. A visitor enters a
+numeric table number (1â€“10,000), then submits item IDs and quantities. The
+backend returns an order snapshot containing item names, images, unit prices,
+subtotals, total, table number, status, and timestamps. Historical order
+pricing is displayed from that snapshot rather than recalculated from the
+current menu.
+
+The order route `/menuscan/:slug/order/:orderId` loads the order on mount and
+renders a themed ticket. It has reusable back navigation to the coffee menu and
+an accessible refresh icon. Refresh performs a new `GET /orders/:orderId`,
+prevents duplicate clicks while in flight, clears a previous error, animates
+while loading, and returns to the idle state in `finally`. The admin order
+screen lists coffee orders by status and allows pending orders to be confirmed
+or rejected.
+
+There is no Socket.IO, Server-Sent Events, polling loop, or other realtime
+transport in the frontend. Refresh is intentionally user-triggered.
+
+## Promotions and availability
+
+`ItemDto`, `AdminItemDto`, and `MenuItem` expose `promotion: number | null` and
+`isAvailable: boolean`. `MenuItemCard` shows the regular price struck through
+when a valid promotion exists and uses the promotion as the effective cart
+price. An unavailable item is visually muted/overlaid, does not expose an
+active promotional price, and cannot be added from the menu. Existing cart
+lines are preserved when availability changes so the visitor can see the line
+and remove it; checkout excludes only lines explicitly known to be unavailable
+and reports backend validation failures.
+
+## Component architecture
+
+- `PublicChrome`, `Header`, `Footer`, and `BackToTop` provide the public shell.
+- `MenuScene`, `BrandIntro`, `CategoryBubbles`, `MenuItemCard`, `ItemArt`, and
+  `PriceBadge` compose the visitor menu.
+- `OrderExperience` and `OrderCenter` provide add-to-cart, cart persistence,
+  table entry, order submission, and active-order navigation.
+- `BackLink` is the shared accessible arrow navigation component used on the
+  category and order pages. Its visual treatment is defined by
+  `.navigation-back` in `globals.css`.
+- `AdminLayout` is the shared admin shell. `AdminPinGate` handles PIN entry;
+  `AppAdmin` and `CoffeeAdmin` orchestrate their respective consoles.
+- `CoffeeForm`, `CategoryForm`, `ItemForm`, list components,
+  `AdminConfirmDialog`, and `AdminNotice` are reusable admin CRUD primitives.
+- `OrdersSection` is the coffee-admin order list. It includes status filtering,
+  manual refresh, status badges, and confirm/reject actions.
+
+There is no data-table library, modal library, global store, or form library.
+Dialogs, buttons, badges, skeletons, and responsive layouts are local CSS and
+React components in this repository.
+
+## Responsive behavior
+
+The design is mobile-first because the public entry point is a QR scan on a
+phone. Public content uses a constrained container, one-handed spacing,
+touch-sized controls, and a fixed cart/order dock. Category item layouts expand
+at wider breakpoints. The order ticket keeps table/status controls separated
+from item lines on small screens. Admin screens use fluid containers, stacked
+controls on narrow viewports, and wrapped action rows; the same components
+remain usable on tablet and desktop. CSS breakpoints and all design tokens are
+in `src/app/globals.css`; there is no JavaScript viewport store.
+
+## Environment variables
+
+| Variable | Required | Purpose | Example |
+| --- | --- | --- | --- |
+| `BACKEND_API_URL` | Optional in local development; required for SSR against a remote backend | Server-side Express origin | `https://api.example.com` |
+| `NEXT_PUBLIC_BACKEND_API_URL` | Optional because it falls back to localhost; required for browser use against a remote backend | Browser-visible Express origin, including uploads | `https://api.example.com` |
+
+The fallback for both is `http://localhost:4000`. Never put PINs, JWTs,
+Cloudflare credentials, or other secrets in the frontend environment or this
+README. The backend must allow the deployed frontend origin through CORS.
+
+## Current Implementation Status
+
+- [x] QR-friendly coffee-scoped public menus
+- [x] Dynamic categories and category item pages
+- [x] Coffee branding, logo, cover, and remote item/category images
+- [x] Promotions and effective-price cart calculation
+- [x] Availability display and add-to-cart protection
+- [x] Per-coffee persistent cart
+- [x] Table-number order submission
+- [x] Visitor order status with pending/confirmed/rejected states
+- [x] Manual order refresh with loading animation
+- [x] Application-admin coffee CRUD and coffee PIN reset
+- [x] Coffee-admin coffee/category/item CRUD
+- [x] Coffee-admin availability and promotion management
+- [x] Coffee-admin order filtering, refresh, confirmation, and rejection
+- [x] SessionStorage PIN sessions and role-aware admin gates
+- [x] French typed UI dictionary (`fr-TN`)
+- [x] Responsive public and admin UI with accessible focus states
+- [ ] Push-based realtime order notifications (not implemented)
+- [ ] Visitor account/login (not implemented)
+
+## Known Limitations
+
+- Order status is not pushed to the browser; visitors must use the refresh
+  control.
+- Visitor orders have no visitor authentication. Possession of an order ID is
+  the current lookup mechanism; backend policy remains authoritative.
+- The cart is local to one browser and coffee slug. It is not synchronized
+  across devices, tabs beyond the custom same-tab event behavior, or users.
+- Public category items are loaded when the category page opens; there is no
+  client-side menu cache or offline menu.
+- The frontend has no automated end-to-end test suite in its package scripts.
+- Remote image availability depends on backend URLs and Next image/runtime
+  configuration; the UI supplies gradient fallbacks when an image is absent or
+  fails.
+
+## Architectural Decisions
+
+- The backend is the source of truth for coffee data, prices, availability,
+  order status, authorization, and validation.
+- Public routes are coffee-scoped under `/menuscan/:slug`; category URLs use a
+  slugified display name resolved back to a category ID within that coffee.
+- Visitors do not authenticate. Admin sessions use short-lived bearer tokens
+  in `sessionStorage`, not `localStorage`; PINs are never persisted.
+- There is one local cart per coffee slug. A cart is not an order until the
+  create-order request succeeds.
+- Orders display backend snapshots, preserving historical item names/prices
+  even if the menu later changes.
+- API calls belong in `src/lib/api.ts` or the focused `src/lib/orders.ts`
+  wrapper; components must not construct backend URLs directly.
+- Server components load public menu data; client components own interactive
+  cart/admin/session state. There is intentionally no global state library.
+- Plain global CSS is the UI system. Reuse tokens and shared components before
+  adding route-specific styles.
+
+## Future Development Handoff
+
+1. Read the route file first to determine whether a feature belongs to a server
+   page or a client feature component.
+2. Add backend DTO changes to `src/types/backend.ts`, API functions to
+   `src/lib/api.ts` or `src/lib/orders.ts`, and presentation-only mapping to
+   `src/lib/adapters.ts`.
+3. Put shared visitor UI in `src/components/menu`, `src/components/ordering`,
+   or `src/components/layout`; put admin UI in `src/components/admin`.
+4. Keep authentication orchestration in `AdminPinGate`, `AppAdmin`,
+   `CoffeeAdmin`, and `admin-session.ts`. Do not duplicate token storage or
+   role checks in individual forms.
+5. Keep cart semantics in `cart.ts`/`OrderCenter`; do not create a second cart
+   state or storage key. Keep order API calls in `orders.ts`.
+6. Add user-facing copy to the typed dictionary contract and French dictionary.
+7. Reuse `BackLink`, `AdminNotice`, `AdminConfirmDialog`, and existing status
+   styles instead of creating lookalike controls.
+8. After architectural or feature-level changes, update this README in the same
+   task, then run `npm run lint`, `npm run typecheck`, and `npm run build` when
+   the environment permits.
+
+## Recent Changes
+
+- Added visitor ordering with table numbers, order snapshots, and status pages.
+- Added coffee-admin order filtering, manual refresh, and status actions.
+- Added promotion and availability support across menu cards, cart, and admin.
+- Fixed shared-cart availability handling across category pages.
+- Added reusable themed `BackLink` navigation and order-page refresh control.
+- Improved responsive status/card presentation and accessible icon controls.

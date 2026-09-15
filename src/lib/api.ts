@@ -5,6 +5,8 @@ import type {
   AdminCoffeeDto,
   AdminItemDto,
   AdminImageDto,
+  AnalyticsDto,
+  AnalyticsQuery,
   ApiEnvelope,
   CoffeeDto,
   CategoryBody,
@@ -101,6 +103,14 @@ function authHeader(token: string): Record<string, string> {
   return { Authorization: "Bearer " + token };
 }
 
+function analyticsQuery(query: AnalyticsQuery): string {
+  const params = new URLSearchParams();
+  if (query.from) params.set("from", query.from);
+  if (query.to) params.set("to", query.to);
+  const value = params.toString();
+  return value ? `?${value}` : "";
+}
+
 function jsonBody(value: unknown): RequestInit {
   return { body: JSON.stringify(value) };
 }
@@ -137,6 +147,11 @@ export function loginCoffeeAdmin(coffeeSlug: string, pin: string): Promise<Admin
 /** GET /api/v1/admin/coffees */
 export function listCoffees(token: string): Promise<AdminCoffeeDto[]> {
   return request<AdminCoffeeDto[]>("/admin/coffees", { headers: authHeader(token) });
+}
+
+/** GET /api/v1/admin/analytics */
+export function getAppAnalytics(token: string, query: AnalyticsQuery = {}): Promise<AnalyticsDto> {
+  return request<AnalyticsDto>(`/admin/insights${analyticsQuery(query)}`, { headers: authHeader(token) });
 }
 
 /** POST /api/v1/admin/coffees */
@@ -182,6 +197,11 @@ export function resetCoffeePin(token: string, coffeeId: string): Promise<{ id: s
 /** GET /api/v1/admin/my-coffee */
 export function getMyCoffee(token: string): Promise<AdminCoffeeDto> {
   return request<AdminCoffeeDto>("/admin/my-coffee", { headers: authHeader(token) });
+}
+
+/** GET /api/v1/admin/my-coffee/analytics */
+export function getCoffeeAnalytics(token: string, query: AnalyticsQuery = {}): Promise<AnalyticsDto> {
+  return request<AnalyticsDto>(`/admin/my-coffee/insights${analyticsQuery(query)}`, { headers: authHeader(token) });
 }
 
 /** PATCH /api/v1/admin/my-coffee */
