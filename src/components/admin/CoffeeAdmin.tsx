@@ -571,7 +571,11 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
         />
       ) : initialView !== "insights" && coffeeStatus === "ready" ? (
         view === "service" || view === "tables" || view === "orders" ? (
-        <OrdersSection token={token} section={view} />
+        <OrdersSection
+          token={token}
+          section={view}
+          onStartService={() => setView("service")}
+        />
       ) : view === "menu" ? (
         <>
           <section className="admin-section">

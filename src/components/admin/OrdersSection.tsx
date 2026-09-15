@@ -38,6 +38,7 @@ const serviceDateTime = (value: string, includeDate = true) =>
 type OrdersSectionProps = {
   token: string;
   section: "service" | "tables" | "orders";
+  onStartService: () => void;
 };
 
 type OpenServiceTable = {
@@ -49,7 +50,7 @@ type OpenServiceTable = {
 
 let serviceRefreshSequence = 0;
 
-export function OrdersSection({ token, section }: OrdersSectionProps) {
+export function OrdersSection({ token, section, onStartService }: OrdersSectionProps) {
   const dict = getDictionary();
   const d = dict.admin.orders;
   const serviceDict = dict.admin.service;
@@ -86,6 +87,7 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
     OpenServiceTable[] | null
   >(null);
   const [returnToServiceClose, setReturnToServiceClose] = useState(false);
+  const [noActiveServiceOrder, setNoActiveServiceOrder] = useState<string | null>(null);
   const loadOrders = useCallback(() => {
     const status = section === "orders" ? filter : undefined;
     const paymentStatus =
@@ -130,9 +132,25 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
   }, [loadShiftData]);
 
   const action = async (id: string, status: OrderStatus) => {
-    await updateOrderStatus(token, id, status);
-    loadOrders();
-    await loadShiftData();
+    try {
+      await updateOrderStatus(token, id, status);
+      loadOrders();
+      await loadShiftData();
+    } catch (e) {
+      if (
+        status === "CONFIRMED" &&
+        e instanceof ApiClientError &&
+        e.status === 409 &&
+        typeof e.details === "object" &&
+        e.details !== null &&
+        "code" in e.details &&
+        e.details.code === "NO_ACTIVE_SERVICE"
+      ) {
+        setNoActiveServiceOrder(id);
+        return;
+      }
+      setError(e instanceof Error ? e.message : "La commande n'a pas pu être mise à jour.");
+    }
   };
 
   const handleOpenShift = async () => {
@@ -827,6 +845,48 @@ export function OrdersSection({ token, section }: OrdersSectionProps) {
           onConfirm={() => void handlePayment()}
           onCancel={() => setPaymentTarget(null)}
         />
+      ) : null}
+      {noActiveServiceOrder ? (
+        <div
+          className="admin-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="no-active-service-title"
+          aria-describedby="no-active-service-description"
+        >
+          <div
+            className="admin-dialog__scrim"
+            onClick={() => setNoActiveServiceOrder(null)}
+            aria-hidden="true"
+          />
+          <div className="admin-dialog__card">
+            <h3 id="no-active-service-title" className="admin-dialog__title">
+              Aucun service actif
+            </h3>
+            <p id="no-active-service-description" className="admin-dialog__text">
+              Vous devez commencer un service avant de pouvoir confirmer cette commande.
+            </p>
+            <div className="admin-dialog__actions">
+              <button
+                type="button"
+                className="admin-btn admin-btn--ghost"
+                onClick={() => setNoActiveServiceOrder(null)}
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn--primary"
+                onClick={() => {
+                  setNoActiveServiceOrder(null);
+                  onStartService();
+                }}
+              >
+                Commencer un service
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
       {serviceCloseTables ? (
         <div
