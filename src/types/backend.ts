@@ -154,6 +154,7 @@ export type OrderStatus = "PENDING" | "CONFIRMED" | "REJECTED";
 export interface OrderLineDto {
   itemId: string;
   name: string;
+  image: string | null;
   quantity: number;
   unitPrice: number;
   subtotal: number;

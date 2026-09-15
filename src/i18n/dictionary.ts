@@ -209,6 +209,7 @@ export interface Dictionary {
       empty: string;
       confirm: string;
       reject: string;
+      refresh: string;
       tableNumber: string;
     };
     settings: {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BackLink } from "@/components/layout/BackLink";
 import { OrderExperience } from "@/components/ordering/OrderExperience";
 import { getDictionary } from "@/i18n";
 import { toMenuItem } from "@/lib/adapters";
@@ -62,20 +62,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     <main id="main">
       <section className="category-page">
         <div className="container category-page__header">
-          <Link className="category-page__back" href={`/menuscan/${slug}`} aria-label={dict.sheet.backLabel}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M19 12H5" />
-              <path d="m12 19-7-7 7-7" />
-            </svg>
-          </Link>
+          <BackLink className="category-page__back" href={`/menuscan/${slug}`} label={dict.sheet.backLabel} />
           <div className="category-page__heading">
             <h1 className="category-page__title">{category.name}</h1>
             <p className="category-page__count">{dict.sheet.itemsCountLabel(menuItems.length)}</p>

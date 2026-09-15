@@ -8,7 +8,7 @@ export const fr: Dictionary = {
     tablePlaceholder: "Ex. 12", addedToCart: "Ajouté ✓", viewOrder: "Voir ma commande", submit: "Envoyer la commande", submitting: "Envoi…",
     invalidCheckout: "Ajoutez un article disponible et indiquez votre numéro de table.",
     submitError: "Impossible d'envoyer la commande.", statusLink: "Suivre une commande",
-    confirmationTitle: "Commande reçue !", confirmationMessage: "Le café a reçu votre commande.",
+    confirmationTitle: "Commande reçue !", confirmationMessage: "",
     status: "État de la commande", statusPending: "En attente", statusConfirmed: "Confirmée",
     statusRejected: "Refusée", statusReady: "Prête", statusCompleted: "Terminée",
     refresh: "Actualiser", orderNotFound: "Commande introuvable.",
@@ -217,6 +217,7 @@ export const fr: Dictionary = {
       empty: "Aucune commande.",
       confirm: "Confirmer",
       reject: "Refuser",
+      refresh: "Actualiser",
       tableNumber: "Table",
     },
     settings: {

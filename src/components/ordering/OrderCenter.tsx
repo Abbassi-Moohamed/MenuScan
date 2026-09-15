@@ -16,6 +16,7 @@ import {
   type CartLine,
 } from "@/lib/cart";
 import type { MenuItem } from "@/types/menu";
+import { ItemArt } from "@/components/menu/ItemArt";
 
 const activeOrderKey = (coffeeSlug: string) => `menuscan:active-order:${coffeeSlug}`;
 
@@ -55,7 +56,13 @@ export function OrderCenter({ coffeeSlug, items = [] }: OrderCenterProps) {
 
   const submit = async () => {
     const table = Number(tableNumber.trim());
-    const validLines = lines.filter((line) => available.size === 0 || available.get(line.item.id)?.isAvailable);
+    // The cart is shared across category pages, so the current page may not
+    // contain every cart item. Only mark an item unavailable when this page
+    // has authoritative data for it; the API remains the final validator.
+    const validLines = lines.filter((line) => {
+      const currentItem = available.get(line.item.id);
+      return currentItem === undefined || currentItem.isAvailable;
+    });
     if (!Number.isInteger(table) || table < 1 || table > 10000 || validLines.length === 0) {
       setError(d.order.invalidCheckout);
       return;
@@ -108,10 +115,13 @@ export function OrderCenter({ coffeeSlug, items = [] }: OrderCenterProps) {
             </div>
             {lines.map((line) => {
               const item = available.get(line.item.id);
-              const unavailable = available.size > 0 && !item?.isAvailable;
+              const unavailable = item !== undefined && !item.isAvailable;
               return (
                 <div className={`cart-line${unavailable ? " cart-line--unavailable" : ""}`} key={line.item.id}>
-                  <div><strong>{line.item.name}</strong><small>{cartLinePrice(line).toFixed(3)} DT</small>{unavailable ? <small>{d.menuItem.unavailable}</small> : null}</div>
+                  <div className="cart-line__product">
+                    <div className="cart-line__image"><ItemArt item={{ ...line.item, description: "", isAvailable: !unavailable }} className="cart-line__image-art" sizes="56px" /></div>
+                    <div><strong>{line.item.name}</strong><small>{cartLinePrice(line).toFixed(3)} DT</small>{unavailable ? <small>{d.menuItem.unavailable}</small> : null}</div>
+                  </div>
                   <div className="cart-line__controls">
                     <button type="button" onClick={() => update(line.item.id, line.quantity - 1)} aria-label={d.order.decrease}>−</button>
                     <span>{line.quantity}</span>
