@@ -558,7 +558,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
         <InsightsDashboard dict={dict} fetchAnalytics={fetchAnalytics} fetchShiftOptions={fetchShiftOptions} onSessionExpired={handleExpired} backHref={`/menuscan/${coffeeSlug}/admin`} />
       ) : null}
 
-      {initialView !== "insights" ? <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>
+      {initialView !== "insights" && !isSettingsView ? <nav className="admin-tabs" role="tablist" aria-label={d.chrome.roleCoffee}>
         {(["service", "tables", "orders"] as const).map((id) => (
           <button
             key={id}
