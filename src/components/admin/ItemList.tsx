@@ -77,6 +77,8 @@ export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelet
                 formatPrice(item.price, siteConfig.currency, siteConfig.locale)
               )}
             </span>
+          </span>
+          <div className="item-row__actions" aria-label={`Actions pour ${item.name}`}>
             <button
               type="button"
               className={`row-action row-action--availability ${item.isAvailable ? "row-action--available" : "row-action--unavailable"}`}
@@ -88,8 +90,6 @@ export function ItemList({ dict, items, loading, error, onRetry, onEdit, onDelet
             >
               {item.isAvailable ? d.items.available : d.items.unavailable}
             </button>
-          </span>
-          <div className="item-row__actions">
             <button type="button" className="row-action" onClick={() => onEdit(item)}>
               {d.items.edit}
             </button>

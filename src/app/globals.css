@@ -2864,6 +2864,12 @@ img {
   justify-content: flex-end;
 }
 
+.item-row__actions {
+  flex: 0 1 24rem;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
 .row-action {
   padding: 0.28rem 0.6rem;
   border-radius: var(--radius-full);
@@ -2881,7 +2887,13 @@ img {
 }
 
 .row-action--availability {
-  min-width: 6.75rem;
+  min-width: 0;
+}
+
+.item-row__actions .row-action {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
 }
 
 .row-action--available {
@@ -3225,6 +3237,11 @@ img {
 
   .category-row__actions,
   .item-row__actions {
+    padding-left: 0.4rem;
+  }
+
+  .item-row__actions {
+    flex-basis: 100%;
     padding-left: 0.4rem;
   }
 
