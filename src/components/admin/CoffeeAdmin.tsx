@@ -223,28 +223,25 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
     };
   }, [token, view, coffeeStatus, categoriesKey, dict, handleExpired]);
 
-  const loadItems = useCallback(
-    async (categoryId: string) => {
-      if (!token) return;
-      setItemsStatus("loading");
-      setItemsError(null);
-      setItems(null);
-      try {
-        const data = await listMyCategoryItems(token, categoryId);
-        setItems(data);
-        setItemsStatus("ready");
-        setItemCounts((prev) => ({ ...prev, [categoryId]: data.length }));
-      } catch (error) {
-        if (isSessionFailure(error)) {
-          handleExpired();
-          return;
-        }
-        setItemsError(actionError(dict, error));
-        setItemsStatus("error");
+  const loadItems = async (categoryId: string) => {
+    if (!token) return;
+    setItemsStatus("loading");
+    setItemsError(null);
+    setItems(null);
+    try {
+      const data = await listMyCategoryItems(token, categoryId);
+      setItems(data);
+      setItemsStatus("ready");
+      setItemCounts((prev) => ({ ...prev, [categoryId]: data.length }));
+    } catch (error) {
+      if (isSessionFailure(error)) {
+        handleExpired();
+        return;
       }
-    },
-    [token, dict, handleExpired],
-  );
+      setItemsError(actionError(dict, error));
+      setItemsStatus("error");
+    }
+  };
 
   if (!authed || !token) {
     return (
@@ -593,6 +590,64 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
           onStartService={() => setView("service")}
         />
       ) : view === "menu" ? (
+        categoryForm || itemForm ? (
+          <section className="admin-section admin-form-page">
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost admin-settings-back"
+              onClick={() => {
+                setCategoryForm(null);
+                setItemForm(null);
+                setCategoryFormError(null);
+                setItemFormError(null);
+              }}
+            >
+              <span aria-hidden="true">←</span>
+              {d.insights.back}
+            </button>
+            {categoryForm ? (
+              <CategoryForm
+                dict={dict}
+                title={categoryForm.mode === "create" ? d.categories.createTitle : d.categories.editTitle}
+                initialName={categoryForm.mode === "edit" ? categoryForm.category.name : undefined}
+                initialImage={categoryForm.mode === "edit" ? categoryForm.category.image : undefined}
+                busy={categoryFormBusy}
+                error={categoryFormError}
+                onSubmit={handleCategorySave}
+                onUpload={uploadForSession}
+                onCancel={() => {
+                  setCategoryForm(null);
+                  setCategoryFormError(null);
+                }}
+              />
+            ) : itemForm && activeCategory ? (
+              <ItemForm
+                dict={dict}
+                title={itemForm.mode === "create" ? d.items.createTitle : d.items.editTitle}
+                initial={
+                  itemForm.mode === "edit"
+                    ? {
+                        name: itemForm.item.name,
+                        description: itemForm.item.description,
+                        price: itemForm.item.price,
+                        promotion: itemForm.item.promotion,
+                        isAvailable: itemForm.item.isAvailable,
+                        image: itemForm.item.image,
+                      }
+                    : undefined
+                }
+                busy={itemFormBusy}
+                error={itemFormError}
+                onSubmit={handleItemSave}
+                onUpload={uploadForSession}
+                onCancel={() => {
+                  setItemForm(null);
+                  setItemFormError(null);
+                }}
+              />
+            ) : null}
+          </section>
+        ) : (
         <>
           <section className="admin-section">
             <div className="admin-head">
@@ -611,27 +666,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
                 {d.categories.add}
               </button>
             </div>
-
-            {categoryForm ? (
-              <CategoryForm
-                dict={dict}
-                title={
-                  categoryForm.mode === "create"
-                    ? d.categories.createTitle
-                    : d.categories.editTitle
-                }
-                initialName={categoryForm.mode === "edit" ? categoryForm.category.name : undefined}
-                initialImage={categoryForm.mode === "edit" ? categoryForm.category.image : undefined}
-                busy={categoryFormBusy}
-                error={categoryFormError}
-                onSubmit={handleCategorySave}
-                onUpload={uploadForSession}
-                onCancel={() => {
-                  setCategoryForm(null);
-                  setCategoryFormError(null);
-                }}
-              />
-            ) : null}
 
             <CategoryList
               dict={dict}
@@ -676,35 +710,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
                 </button>
               </div>
 
-              {itemForm ? (
-                <ItemForm
-                  dict={dict}
-                  title={
-                    itemForm.mode === "create" ? d.items.createTitle : d.items.editTitle
-                  }
-                  initial={
-                    itemForm.mode === "edit"
-                      ? {
-                          name: itemForm.item.name,
-                          description: itemForm.item.description,
-                          price: itemForm.item.price,
-                          promotion: itemForm.item.promotion,
-                          isAvailable: itemForm.item.isAvailable,
-                          image: itemForm.item.image,
-                        }
-                      : undefined
-                  }
-                  busy={itemFormBusy}
-                  error={itemFormError}
-                  onSubmit={handleItemSave}
-                  onUpload={uploadForSession}
-                  onCancel={() => {
-                    setItemForm(null);
-                    setItemFormError(null);
-                  }}
-                />
-              ) : null}
-
               <ItemList
                 dict={dict}
                 items={items ?? []}
@@ -722,6 +727,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
             </section>
           ) : null}
         </>
+        )
       ) : view === "profile" ? (
         coffee ? (
           <section className="admin-section">
