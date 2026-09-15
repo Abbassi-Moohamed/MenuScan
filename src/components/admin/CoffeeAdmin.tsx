@@ -116,6 +116,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
   const [view, setView] = useState<View>("service");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const isSettingsView = view === "menu" || view === "profile" || view === "security";
 
   const [categories, setCategories] = useState<AdminCategoryDto[] | null>(null);
   const [catStatus, setCatStatus] = useState<AsyncStatus>("idle");
@@ -461,7 +462,7 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
       subtitle={d.chrome.roleCoffee}
       logo={coffee?.logo}
       publicMenuHref={`/menuscan/${coffeeSlug}`}
-      hideHeader={initialView === "insights"}
+      hideHeader={initialView === "insights" || isSettingsView}
       headerActions={
         <div className="admin-header-settings">
           <button
@@ -536,6 +537,21 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
         <p className="admin-toast" role="status">
           {notice}
         </p>
+      ) : null}
+
+      {initialView !== "insights" && isSettingsView ? (
+        <button
+          type="button"
+          className="admin-btn admin-btn--ghost admin-settings-back"
+          onClick={() => {
+            setView("service");
+            setCategoryForm(null);
+            setItemForm(null);
+          }}
+        >
+          <span aria-hidden="true">←</span>
+          {d.insights.back}
+        </button>
       ) : null}
 
       {initialView === "insights" ? (

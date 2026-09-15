@@ -2110,6 +2110,10 @@ img {
   border: 1px solid var(--color-line);
 }
 
+.admin-settings-back {
+  margin-bottom: 1rem;
+}
+
 @media (hover: hover) {
   .admin-btn--ghost:hover:not(:disabled) {
     border-color: var(--color-mocha-400);
