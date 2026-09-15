@@ -131,7 +131,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
   const [items, setItems] = useState<AdminItemDto[] | null>(null);
   const [itemsStatus, setItemsStatus] = useState<AsyncStatus>("idle");
   const [itemsError, setItemsError] = useState<string | null>(null);
-  const [itemCounts, setItemCounts] = useState<Record<string, number>>({});
   const [itemForm, setItemForm] = useState<ItemFormState>(null);
   const [itemFormBusy, setItemFormBusy] = useState(false);
   const [itemAvailabilityBusy, setItemAvailabilityBusy] = useState<string | null>(null);
@@ -232,7 +231,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
       const data = await listMyCategoryItems(token, categoryId);
       setItems(data);
       setItemsStatus("ready");
-      setItemCounts((prev) => ({ ...prev, [categoryId]: data.length }));
     } catch (error) {
       if (isSessionFailure(error)) {
         handleExpired();
@@ -731,7 +729,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
             <CategoryList
               dict={dict}
               categories={categories ?? []}
-              itemCounts={itemCounts}
               selectedId={activeCategoryId}
               loading={catStatus === "idle"}
               error={catStatus === "error" ? catError : null}

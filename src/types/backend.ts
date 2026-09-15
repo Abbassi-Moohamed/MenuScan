@@ -7,7 +7,7 @@ export interface CategoryDto { id: string; name: string; image: string | null }
 export interface CoffeeDto { id: string; name: string; logo: string; cover: string | null; slug: string; categories: CategoryDto[] }
 export interface ItemDto { id: string; name: string; description: string | null; price: number; promotion: number | null; isAvailable: boolean; image: string | null }
 export interface AdminCoffeeDto { id: string; name: string; logo: string; cover: string | null; slug: string; categoryCount: number; createdAt: string; updatedAt: string }
-export interface AdminCategoryDto { id: string; name: string; image: string | null; createdAt: string; updatedAt: string }
+export interface AdminCategoryDto { id: string; name: string; image: string | null; itemCount: number; createdAt: string; updatedAt: string }
 export interface AdminItemDto extends ItemDto { itemCategoryId: string; createdAt: string; updatedAt: string }
 export interface AdminImageDto { imageId: string; url: string }
 export interface CreateCoffeeBody { name: string; logo: string; cover?: string; slug?: string }

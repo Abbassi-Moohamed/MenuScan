@@ -90,6 +90,7 @@ export interface Dictionary {
       categoryCount: (count: number) => string;
       openMenu: string;
       edit: string;
+      viewItems: string;
       resetPin: string;
       resetPinDialogTitle: string;
       resetPinDialogText: string;
@@ -137,6 +138,7 @@ export interface Dictionary {
       title: string;
       add: string;
       edit: string;
+      viewItems: string;
       emptyTitle: string;
       emptyMessage: string;
       itemCount: (count: number) => string;

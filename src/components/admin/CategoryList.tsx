@@ -9,8 +9,6 @@ import { AdminNotice } from "./AdminNotice";
 interface CategoryListProps {
   dict: Dictionary;
   categories: AdminCategoryDto[];
-  /** Known per-category item counts (filled lazily as items load). */
-  itemCounts: Record<string, number>;
   selectedId: string | null;
   loading: boolean;
   error?: string | null;
@@ -24,7 +22,6 @@ interface CategoryListProps {
 export function CategoryList({
   dict,
   categories,
-  itemCounts,
   selectedId,
   loading,
   error,
@@ -74,14 +71,14 @@ export function CategoryList({
   return (
     <ul className="category-list">
       {categories.map((category) => {
-        const count = itemCounts[category.id];
+        const count = category.itemCount;
         return (
           <li key={category.id} className="category-row">
             <button
               type="button"
               className={cn("category-row__main", selectedId === category.id && "category-row__main--active")}
               onClick={() => onSelect(category)}
-              aria-label={`${category.name} — ${d.categories.itemCount(count ?? 0)}`}
+              aria-label={`${category.name} — ${d.categories.itemCount(count)}`}
             >
               {category.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -92,11 +89,12 @@ export function CategoryList({
                 </span>
               )}
               <span className="category-row__name">{category.name}</span>
-              <span className="category-row__count">
-                {count === undefined ? "·" : d.categories.itemCount(count)}
-              </span>
+              <span className="category-row__count">{d.categories.itemCount(count)}</span>
             </button>
             <div className="category-row__actions">
+              <button type="button" className="row-action" onClick={() => onSelect(category)}>
+                {d.categories.viewItems}
+              </button>
               <button type="button" className="row-action" onClick={() => onEdit(category)}>
                 {d.categories.edit}
               </button>
