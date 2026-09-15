@@ -248,11 +248,12 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
   const openTablePayment = async (sessionId: string) => {
     const detail = await getTableSession(token, sessionId);
     const tableOrders = detail.summary?.orders ?? [];
+    const pending = tableOrders.filter((order) => order.status === "PENDING");
     const unpaid = tableOrders.filter(
       (order) =>
         order.status === "CONFIRMED" && order.paymentStatus === "UNPAID",
     );
-    if (unpaid.length > 0) {
+    if (pending.length > 0 || unpaid.length > 0) {
       setTablePayment({
         sessionId,
         tableNumber: detail.tableNumber,
@@ -261,6 +262,44 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
       return false;
     }
     return true;
+  };
+
+  const refreshTablePayment = async (sessionId: string) => {
+    const detail = await getTableSession(token, sessionId);
+    setTablePayment({
+      sessionId: detail.id,
+      tableNumber: detail.tableNumber,
+      orders: detail.summary?.orders ?? [],
+    });
+  };
+
+  const handleTableOrderStatus = async (order: TablePaymentOrderDto, status: OrderStatus) => {
+    try {
+      const updated = await updateOrderStatus(token, order.id, status);
+      setOrders((current) =>
+        current.map((item) => (item.id === updated.id ? updated : item)),
+      );
+      if (tablePayment) await refreshTablePayment(tablePayment.sessionId);
+      await loadShiftData();
+    } catch (e) {
+      if (
+        status === "CONFIRMED" &&
+        e instanceof ApiClientError &&
+        e.status === 409 &&
+        typeof e.details === "object" &&
+        e.details !== null &&
+        "code" in e.details &&
+        e.details.code === "NO_ACTIVE_SERVICE"
+      ) {
+        setNoActiveServiceOrder(order.id);
+        return;
+      }
+      setError(
+        e instanceof Error
+          ? e.message
+          : "La commande n'a pas pu être mise à jour.",
+      );
+    }
   };
 
   const handleCloseTable = async (sessionId: string) => {
@@ -310,6 +349,8 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
       (order) =>
         order.status === "CONFIRMED" && order.paymentStatus === "UNPAID",
     ) ?? [];
+  const tablePendingOrders =
+    tablePayment?.orders.filter((order) => order.status === "PENDING") ?? [];
   const tableTotal =
     tablePayment?.orders
       .filter((order) => order.status === "CONFIRMED")
@@ -759,8 +800,10 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
               Paiement de la table {tablePayment.tableNumber}
             </h3>
             <p id="table-payment-description" className="admin-dialog__text">
-              {tableUnpaidOrders.length > 0
-                ? "Cette table contient des commandes non payées. Finalisez les paiements avant de la clôturer."
+              {tablePendingOrders.length > 0
+                ? "Cette table contient des commandes en attente. Refusez-les ou confirmez-les, puis enregistrez leur paiement avant de la clôturer."
+                : tableUnpaidOrders.length > 0
+                  ? "Cette table contient des commandes non payées. Finalisez les paiements avant de la clôturer."
                 : "Toutes les commandes confirmées de cette table sont payées."}
             </p>
             <div className="admin-table-payment-summary">
@@ -775,6 +818,32 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
               </span>
             </div>
             <div className="admin-table-payment-list">
+              {tablePendingOrders.map((order) => (
+                <div className="admin-table-payment-row" key={order.id}>
+                  <div>
+                    <strong>Commande #{order.id.slice(-6)}</strong>
+                    <span>{order.total.toFixed(3)} DT · En attente</span>
+                  </div>
+                  <div className="admin-form__actions">
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--ghost"
+                      onClick={() => void handleTableOrderStatus(order, "REJECTED")}
+                      disabled={paymentBusy}
+                    >
+                      Refuser
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--primary"
+                      onClick={() => void handleTableOrderStatus(order, "CONFIRMED")}
+                      disabled={paymentBusy}
+                    >
+                      Confirmer
+                    </button>
+                  </div>
+                </div>
+              ))}
               {tablePayment.orders
                 .filter((order) => order.status === "CONFIRMED")
                 .map((order) => (
@@ -815,7 +884,7 @@ export function OrdersSection({ token, section, onStartService }: OrdersSectionP
               >
                 Fermer
               </button>
-              {tableUnpaidOrders.length === 0 ? (
+              {tablePendingOrders.length === 0 && tableUnpaidOrders.length === 0 ? (
                 <button
                   type="button"
                   className="admin-btn admin-btn--primary"
