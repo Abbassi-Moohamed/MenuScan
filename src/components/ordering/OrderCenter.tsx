@@ -117,7 +117,7 @@ export function OrderCenter({ coffeeSlug, items = [] }: OrderCenterProps) {
 
   return (
     <>
-      <div className="order-dock" aria-label={d.order.openCart}>
+      <div className={`order-dock${open ? " order-dock--open" : ""}`} aria-label={d.order.openCart}>
         {lines.length > 0 ? (
           <button className="cart-fab" type="button" onClick={() => setOpen(true)} aria-label={d.order.openCart}>
             <span aria-hidden="true">🛒</span><span>{cartCount(lines)}</span>
