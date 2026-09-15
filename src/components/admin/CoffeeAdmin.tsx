@@ -647,6 +647,67 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
               />
             ) : null}
           </section>
+        ) : activeCategory ? (
+          <section className="admin-section admin-form-page">
+            <button
+              type="button"
+              className="admin-btn admin-btn--ghost admin-settings-back"
+              onClick={() => {
+                setActiveCategoryId(null);
+                setItems(null);
+                setItemsError(null);
+                setItemsStatus("idle");
+              }}
+            >
+              <span aria-hidden="true">←</span>
+              {d.insights.back}
+            </button>
+            <div className="admin-head">
+              <div className="admin-head__text">
+                <p className="admin-head__hint">Catégorie</p>
+                <h2 className="admin-head__title">{activeCategory.name}</h2>
+                <p className="admin-head__hint">
+                  Consultez les articles de cette catégorie ou ajoutez-en un nouveau.
+                </p>
+              </div>
+              <div className="admin-form__actions">
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--ghost"
+                  onClick={() => {
+                    setCategoryFormError(null);
+                    setCategoryForm({ mode: "edit", category: activeCategory });
+                  }}
+                >
+                  {d.categories.edit}
+                </button>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--primary"
+                  onClick={() => {
+                    setItemFormError(null);
+                    setItemForm({ mode: "create" });
+                  }}
+                >
+                  {d.items.add}
+                </button>
+              </div>
+            </div>
+            <ItemList
+              dict={dict}
+              items={items ?? []}
+              loading={itemsStatus === "loading" || itemsStatus === "idle"}
+              error={itemsStatus === "error" ? itemsError : null}
+              onRetry={() => activeCategoryId && void loadItems(activeCategoryId)}
+              onEdit={(item) => {
+                setItemFormError(null);
+                setItemForm({ mode: "edit", item });
+              }}
+              onDelete={(item) => setItemDelete(item)}
+              onToggleAvailability={(item) => void handleItemAvailability(item)}
+              availabilityBusyId={itemAvailabilityBusy}
+            />
+          </section>
         ) : (
         <>
           <section className="admin-section">
@@ -692,40 +753,6 @@ export function CoffeeAdmin({ coffeeSlug, initialView = "menu" }: CoffeeAdminPro
             />
           </section>
 
-          {activeCategory ? (
-            <section className="admin-section">
-              <div className="admin-head">
-                <div className="admin-head__text">
-                  <h2 className="admin-head__title">{d.items.ofCategory(activeCategory.name)}</h2>
-                </div>
-                <button
-                  type="button"
-                  className="admin-btn admin-btn--primary"
-                  onClick={() => {
-                    setItemFormError(null);
-                    setItemForm({ mode: "create" });
-                  }}
-                >
-                  {d.items.add}
-                </button>
-              </div>
-
-              <ItemList
-                dict={dict}
-                items={items ?? []}
-                loading={itemsStatus === "loading" || itemsStatus === "idle"}
-                error={itemsStatus === "error" ? itemsError : null}
-                onRetry={() => activeCategoryId && void loadItems(activeCategoryId)}
-                onEdit={(item) => {
-                  setItemFormError(null);
-                  setItemForm({ mode: "edit", item });
-                }}
-                onDelete={(item) => setItemDelete(item)}
-                onToggleAvailability={(item) => void handleItemAvailability(item)}
-                availabilityBusyId={itemAvailabilityBusy}
-              />
-            </section>
-          ) : null}
         </>
         )
       ) : view === "profile" ? (
